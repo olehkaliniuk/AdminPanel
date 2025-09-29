@@ -1,0 +1,79 @@
+﻿@model AdminPanelDB.ViewModels.AdminPanelViewModel
+
+
+
+@Html.Partial("_AdminNavbar")
+
+
+@if (TempData["Error"] != null)
+{
+    <p style="color:red">@TempData["Error"]</p>
+}
+
+
+
+
+<!-- Linke Spalte: Abteilungen & Referate -->
+<div class="admin-left">
+    <h2>Admin Panel</h2>
+
+    <form asp-action="CreateAbteilung" method="post">
+        <input type="text" name="name" placeholder="New Abteilung" />
+        <button type="submit">Add Abteilung</button>
+    </form>
+
+    <table id="abteilungenTable">
+        <thead>
+            <tr>
+                <th>Abteilung</th>
+                <th>Referate</th>
+                <th>Actions</th>
+            </tr>
+            <tr class="filter-row">
+                <th><input type="text" placeholder="Filter Abteilung" onkeyup="filterTable('abteilungenTable', 0)"></th>
+                <th><input type="text" placeholder="Filter Referate" onkeyup="filterTable('abteilungenTable', 1)"></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Abteilungen)
+            {
+                <tr>
+                    <td>
+                        <form asp-action="EditAbteilung" method="post">
+                            <input type="hidden" name="id" value="@item.Abteilung.Id" />
+                            <input type="text" name="newName" value="@item.Abteilung.Name" />
+                            <button type="submit">Save</button>
+                        </form>
+                        <form asp-action="DeleteAbteilung" method="post">
+                            <input type="hidden" name="id" value="@item.Abteilung.Id" />
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        @foreach (var refa in item.Referate)
+                        {
+                            <form asp-action="EditReferat" method="post">
+                                <input type="hidden" name="id" value="@refa.Id" />
+                                <input type="text" name="name" value="@refa.Name" />
+                                <button type="submit">Save</button>
+                            </form>
+                            <form asp-action="DeleteReferat" method="post">
+                                <input type="hidden" name="id" value="@refa.Id" />
+                                <button type="submit">Delete</button>
+                            </form>
+                            <br />
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="CreateReferat" method="post">
+                            <input type="hidden" name="abteilungId" value="@item.Abteilung.Id" />
+                            <input type="text" name="name" placeholder="New Referat" />
+                            <button type="submit">Add</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

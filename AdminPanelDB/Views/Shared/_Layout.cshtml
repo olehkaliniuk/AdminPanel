@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AdminPanelDB</title>
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/AdminPanelDB.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+      
+        <div>
+    <ul>
+        @if (Context.Session.GetString("UserName") == null)
+        {
+            <li><a asp-controller="Auth" asp-action="Login">Login</a></li>
+        }
+        else
+        {
+            <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
+            <li><a asp-controller="User" asp-action="UserData">User Page</a></li>
+
+            var isAdmin = Context.Session.GetString("UserEmail") ?? "";
+            if (isAdmin.Split(',').Any(r => r.Trim().Equals("admin@gmail.com", StringComparison.OrdinalIgnoreCase)))
+            {
+                <li><a asp-controller="Admin" asp-action="AbRef">Admin Panel</a></li>
+            }
+             <li>User: @Context.Session.GetString("UserEmail")</li>
+ 
+        }
+    </ul>
+</div>
+
+
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

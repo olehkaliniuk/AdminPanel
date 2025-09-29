@@ -1,0 +1,17 @@
+﻿<h2>Login</h2>
+
+<form method="post" asp-controller="Auth" asp-action="Login" class="login">
+    <div>
+        <input type="text" name="email" placeholder="Email" />
+    </div>
+    <div>
+        <input type="password" name="kennwort" placeholder="Kennwort" />
+    </div>
+    <div>
+        <button type="submit">Login</button>
+    </div>
+    @if (ViewBag.Error != null)
+    {
+        <p style="color:red">@ViewBag.Error</p>
+    }
+</form>

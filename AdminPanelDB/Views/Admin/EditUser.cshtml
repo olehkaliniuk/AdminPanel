@@ -1,0 +1,126 @@
+﻿@model AdminPanelDB.Models.Personen
+
+<h2 style="text-align:center;">Edit User</h2>
+
+<div class="form-container">
+    <form asp-action="EditUser" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <input asp-for="Titel" placeholder="Titel" />
+        <input asp-for="Name" placeholder="Name" />
+        <input asp-for="Vorname" placeholder="Vorname" />
+        <input asp-for="Email" placeholder="Email" />
+        <input asp-for="UId" placeholder="UId" />
+
+        <select id="abteilungDropdown" name="Abteilung">
+            <option value="">-- Select Abteilung --</option>
+            @foreach (var abt in ViewBag.Abteilungen)
+            {
+                if (Model.Abteilung != null && Model.Abteilung.Trim() == abt.Name.Trim())
+                {
+                    @Html.Raw($"<option value='{abt.Name}' data-id='{abt.Id}' selected>{abt.Name}</option>")
+                }
+                else
+                {
+                    @Html.Raw($"<option value='{abt.Name}' data-id='{abt.Id}'>{abt.Name}</option>")
+                }
+            }
+        </select>
+
+        <select id="referatDropdown" name="Referat">
+            <option value="">-- Select Referat --</option>
+            @if (ViewBag.Referate != null)
+            {
+                foreach (var refa in ViewBag.Referate)
+                {
+                    if (Model.Referat != null && Model.Referat.Trim() == refa.Name.Trim())
+                    {
+                        @Html.Raw($"<option value='{refa.Name}' selected>{refa.Name}</option>")
+                    }
+                    else
+                    {
+                        @Html.Raw($"<option value='{refa.Name}'>{refa.Name}</option>")
+                    }
+                }
+            }
+        </select>
+
+        <input asp-for="Stelle" placeholder="Stelle" />
+        <input asp-for="Kennwort" placeholder="Kennwort" />
+
+        <button type="submit">Save</button>
+    </form>
+
+    <a asp-action="Personen">Go back</a>
+</div>
+
+<script>
+    document.getElementById("abteilungDropdown").addEventListener("change", function () {
+        var abteilungId = this.options[this.selectedIndex].getAttribute("data-id");
+        var referatDropdown = document.getElementById("referatDropdown");
+        var currentReferat = referatDropdown.value; // сохраняем текущий выбор
+
+        fetch('/Admin/GetReferateByAbteilung?abteilungId=' + abteilungId)
+            .then(response => response.json())
+            .then(data => {
+                referatDropdown.innerHTML = '<option value="">-- Select Referat --</option>';
+                data.forEach(ref => {
+                    var opt = document.createElement("option");
+                    opt.value = ref.name;
+                    opt.textContent = ref.name;
+                    if (ref.name === currentReferat) {
+                        opt.selected = true;
+                    }
+                    referatDropdown.appendChild(opt);
+                });
+            });
+    });
+</script>
+
+<style>
+    .form-container {
+        display: flex;
+        flex-direction: column; /* колонки сверху вниз */
+        align-items: center; /* центрируем по горизонтали */
+        gap: 15px;
+        margin-top: 50px;
+    }
+
+        /* Все элементы формы блочно и одинаковой ширины */
+        .form-container form input,
+        .form-container form select,
+        .form-container form button {
+            display: block;
+            width: 250px;
+            padding: 8px 12px;
+            margin: 5px 0;   
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-container form button {   
+            cursor: pointer;
+            background-color: #2a2a2a;
+            border: 1px solid #555;
+            transition: background 0.3s ease;
+        }
+
+            .form-container form button:hover {
+                background-color: #333;
+            }
+
+        .form-container a {
+            margin-top: 10px;
+            color: #e0e0e0;
+            text-decoration: underline;
+            transition: color 0.3s ease;
+        }
+
+            .form-container a:hover {
+                color: #bbbbbb;
+            }
+</style>

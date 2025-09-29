@@ -1,0 +1,143 @@
+﻿@model AdminPanelDB.ViewModels.AdminPanelViewModel
+
+@Html.Partial("_AdminNavbar")
+
+
+<!-- Rechte Spalte: Personen -->
+<div class="admin-right">
+    <h2>Personen</h2>
+
+    <table id="personenTable">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titel</th>
+                <th>Name</th>
+                <th>Vorname</th>
+                <th>Email</th>
+                <th>UId</th>
+                <th>Abteilung</th>
+                <th>Referat</th>
+                <th>Stelle</th>
+                <th>Kennwort</th>
+                <th>Actions</th>
+            </tr>
+            <tr class="filter-row">
+                <th><input type="text" placeholder="Filter Id" onkeyup="filterTable('personenTable', 0)"></th>
+                <th><input type="text" placeholder="Filter Titel" onkeyup="filterTable('personenTable', 1)"></th>
+                <th><input type="text" placeholder="Filter Name" onkeyup="filterTable('personenTable', 2)"></th>
+                <th><input type="text" placeholder="Filter Vorname" onkeyup="filterTable('personenTable', 3)"></th>
+                <th><input type="text" placeholder="Filter Email" onkeyup="filterTable('personenTable', 4)"></th>
+                <th><input type="text" placeholder="Filter UId" onkeyup="filterTable('personenTable', 5)"></th>
+                <th><input type="text" placeholder="Filter Abteilung" onkeyup="filterTable('personenTable', 6)"></th>
+                <th><input type="text" placeholder="Filter Referat" onkeyup="filterTable('personenTable', 7)"></th>
+                <th><input type="text" placeholder="Filter Stelle" onkeyup="filterTable('personenTable', 8)"></th>
+                <th><input type="text" placeholder="Filter Kennwort" onkeyup="filterTable('personenTable', 9)"></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Personen)
+            {
+                <tr>
+                    <td>@p.Id</td>
+                    <td>@p.Titel</td>
+                    <td>@p.Name</td>
+                    <td>@p.Vorname</td>
+                    <td>@p.Email</td>
+                    <td>@p.UId</td>
+                    <td>@p.Abteilung</td>
+                    <td>@p.Referat</td>
+                    <td>@p.Stelle</td>
+                    <td>@p.Kennwort</td>
+                    <td>
+                        <a asp-action="EditUser" asp-route-id="@p.Id" class="btn-edit">Edit</a>
+                        <form asp-action="DeleteUser" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@p.Id" />
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-action="CreateUser" class="btn-edit">Create</a>
+</div>
+
+
+
+<script>
+    function filterTable(tableId, colIndex) {
+        const table = document.getElementById(tableId);
+        const tr = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        const input = document.querySelector(`#${tableId} thead tr.filter-row th:nth-child(${colIndex + 1}) input`);
+        const filter = input.value.toLowerCase();
+
+        for (let i = 0; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName("td")[colIndex];
+            if (td) {
+                // ищем input внутри td, если есть
+                const inputElem = td.querySelector('input');
+                let txtValue = inputElem ? inputElem.value : td.textContent || td.innerText;
+                txtValue = txtValue.toLowerCase();
+                tr[i].style.display = txtValue.indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+
+</script>
+
+<style>
+    /* Общие стили для кнопок */
+    .btn-edit, .btn-delete, .btn-create {
+        display: inline-block;
+        padding: 6px 14px;
+        margin: 2px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        color: #e0e0e0;
+    }
+
+    /* Edit кнопка */
+    .btn-edit {
+        background-color: #2a2a2a;
+        border-color: #444;
+    }
+
+        .btn-edit:hover {
+            background-color: #3b3b3b;
+            border-color: #666;
+        }
+
+    /* Delete кнопка */
+    .btn-delete {
+        background-color: #7f1d1d;
+        border-color: #a33;
+    }
+
+        .btn-delete:hover {
+            background-color: #a33;
+            border-color: #d22;
+        }
+
+    /* Create кнопка */
+    .btn-create {
+        background-color: #1f4f7f;
+        border-color: #346;
+        color: #fff;
+        padding: 8px 18px;
+        border-radius: 6px;
+    }
+
+        .btn-create:hover {
+            background-color: #346;
+            border-color: #1f4f7f;
+        }
+
+
+</style>
