@@ -1,0 +1,176 @@
+﻿@model EditAdresseViewModel
+
+@functions {
+    string ResolveDynamicFieldValue(Adresse a, string fieldName, bool isBilling)
+    {
+        // Liste Aller Alternativen Namen.
+        var list = new[] {
+            "Area", "County", "Department", "District", "Do_si",
+            "Emirate", "Island", "Oblast", "Parish", "Prefecture", "State", "Bundesland"
+        };
+
+        // Wenn Das Feld Nicht Zu Den Alternativen Gehört — Einfach Die Eigenschaft Direkt Nehmen.
+        if (!list.Contains(fieldName))
+        {
+            var prop = a.GetType().GetProperty(fieldName);
+            if (prop != null)
+            {
+                return prop.GetValue(a, null)?.ToString();
+            }
+        }
+
+        // if not billing.
+        if (!isBilling)
+        {
+            return a.StateOrPrefecture;
+        }
+      
+
+        // if billing.
+        return a.RechnungsStateOrPrefecture;
+    }
+}
+
+<div id="validationErrors">
+    @if (Model.Errors != null && Model.Errors.Any())
+    {
+        <ul style="color:red; text-align:center; font-weight:bold;">
+            @foreach (var err in Model.Errors)
+            {
+                <li style="list-style:none">@err</li>
+            }
+        </ul>
+    }
+</div>
+
+
+<h2 style="text-align:center;">Adresse bearbeiten</h2>
+
+<div class="form-container">
+    <form id="adresseForm" asp-action="EditAdresse" method="post">
+
+        <input type="hidden" name="Id" value="@Model.Adresse.Id" />
+
+        <!-- Aktuelle Seite und Sortierung speichern. -->
+        <input type="hidden" name="page" value="@ViewBag.Page" />
+        <input type="hidden" name="sortColumn" value="@ViewBag.SortColumn" />
+        <input type="hidden" name="sortDirection" value="@ViewBag.SortDirection" />
+        <input type="hidden" name="pageSize" value="@ViewBag.PageSize" />
+
+        <div style="display:flex; gap:20px;">
+
+            <!-- Normale Adresse -->
+            <div class="adresseBox">
+                <label>Land:</label>
+                <select id="countrySelect" class="form-select" name="Land">
+                    <option value="">---</option>
+                    @foreach (var c in Model.Countries)
+                    {
+                        <option value="@c.Code" selected="@(c.Code == Model.Adresse.Land)">
+                            @c.Name
+                        </option>
+                    }
+                </select>
+
+                <div id="dynamicFields">
+                   @foreach (var f in Model.AddressFields)
+                    {
+                        var name = $"Adresse_{f}";
+                        var value = ResolveDynamicFieldValue(Model.Adresse, f, false);
+
+                        <div>
+                            <label>@f:</label>
+                            <input type="text" name="@name" value="@value" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Static fields. -->
+            <div class="staticfields adresseBox">
+                <label>Gebaude:</label>
+                <input type="text" name="Gebaude" value="@Model.Adresse.Gebaude" />
+
+                <label>Wohnung:</label>
+                <input type="text" name="Wohnung" value="@Model.Adresse.Wohnung" />
+
+                <label>Bezeichnung:</label>
+                <input type="text" name="Bezeichnung" value="@Model.Adresse.Bezeichnung" />
+
+                <label>IBAN:</label>
+                <input type="text" name="Iban" value="@Model.Adresse.Iban" />
+
+                <label>BIC:</label>
+                <input type="text" name="Bic" value="@Model.Adresse.Bic" />
+
+                <label>
+                    Ist Insolvent:
+                    <input type="checkbox" name="IstInsolvent" @(Model.Adresse.IstInsolvent ? "checked" : "") />
+       
+                </label>
+
+                <label>
+                    Ist Aktiv:
+                    <input type="checkbox" name="IstAktiv" @(Model.Adresse.IstAktiv ? "checked" : "") />
+                </label>
+
+                <label>Ansprechpartner:</label>
+                <input type="text" name="Ansprechpartner" value="@Model.Adresse.Ansprechpartner" />
+
+                <label>AnsprechpartnerTel:</label>
+                <input type="text" name="AnsprechpartnerTel" value="@Model.Adresse.AnsprechpartnerTel" />
+
+                <label>AnsprechpartnerEmail:</label>
+                <input type="text" name="AnsprechpartnerEmail" value="@Model.Adresse.AnsprechpartnerEmail" />
+            </div>
+
+            <!-- Rechnungsadresse. -->
+            <div class="adresseBox">
+                <label>Land: (Rechnung)</label>
+                <select id="billCountrySelect" class="form-select" name="RechnungsLand">
+                    <option value="">---</option>
+                    @foreach (var c in Model.Countries)
+                    {
+                        <option value="@c.Code" selected="@(c.Code == Model.Adresse.RechnungsLand)">
+                            @c.Name
+                        </option>
+                    }
+                </select>
+
+                <div id="billDynamicFields">
+                    @foreach (var f in Model.BillingFields)
+                    {
+                        var name = $"Rechnungs_{f}";
+                        var value = ResolveDynamicFieldValue(Model.Adresse, f, true);
+
+
+                        <div>
+                            <label>@f:</label>
+                            <input type="text" name="@name" value="@value" />
+                        </div>
+                    }
+                </div>
+
+                <button type="button" id="copyAddress">Adresse Kopieren</button>
+            </div>
+
+            <!-- Gesamtadresse. -->
+            <div class="adresseBox">
+                <label>Gesamtadresse:</label>
+                <textarea style="min-height:200px;" name="Gesamtadresse" id="fullAddress">@Model.Adresse.Gesamtadresse</textarea>
+                <button type="button" onclick="gesamtAdresse()">Hinzufügen</button>
+            </div>
+
+        </div>
+
+        <div style="display:flex; justify-content:center; margin-top:2px;">
+            <button type="submit">Speichern</button>
+        </div>
+    </form>
+
+    <a asp-action="Adresse" asp-route-page="@ViewBag.Page"
+       asp-route-pageSize="@ViewBag.PageSize"
+       asp-route-sortColumn="@ViewBag.SortColumn"
+       asp-route-sortDirection="@ViewBag.SortDirection">Züruck</a>
+
+</div>

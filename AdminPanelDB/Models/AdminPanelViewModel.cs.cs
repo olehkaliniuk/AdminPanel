@@ -6,8 +6,18 @@ namespace AdminPanelDB.ViewModels
 {
     public class AdminPanelViewModel
     {
-        public List<AbteilungReferateViewModel> Abteilungen { get; set; }
-        public List<Personen> Personen { get; set; }
-  
+        public PaginatedList<AbteilungReferateViewModel>? Abteilungen { get; set; } 
+        public PaginatedList<Personen>? Personen { get; set; }
+
+        public PersonenFilter? Filter { get; set; }
+
+        public string? AbteilungSearchTerm { get; set; }
+        public string? ReferatSearchTerm { get; set; }
+
+        //Neue Properties für Sortierung.
+        public string? SortColumn { get; set; } 
+        public string? SortDirection { get; set; } 
+
+
     }
 }

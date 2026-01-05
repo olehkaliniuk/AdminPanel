@@ -1,0 +1,56 @@
+﻿@model AdminPanelDB.Models.Personen
+
+<h2 style="text-align:center;">Temporäres Passwort erstellen</h2>
+
+<div class="form-container">
+    <div>
+        <label>E-Mail des Benutzers:</label>
+        <input type="text"  value="@Model?.Email" readonly />
+    </div>
+
+    <div>
+        <label>Temporäres Passwort:</label>
+        <input type="text" id="tempPasswordField"  readonly placeholder="Klicken Sie auf 'Passwort generieren'">
+    </div>
+
+    <div>
+        <button type="button"  id="generateTempPassword">Passwort generieren</button>
+    </div>
+
+    <form asp-action="TKennwort" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="TKennowort" id="tempPasswordInput" />
+
+        <button type="submit" >In der Datenbank speichern</button>
+    </form>
+
+    <a asp-controller="Admin" asp-action="EditUser" asp-route-id="@Model.Id">
+       Züruck
+    </a>
+
+    <div>
+        <strong>Hinweis:</strong> Kopieren Sie das temporäre Passwort jetzt, da es später nicht mehr angezeigt wird.
+        Nach dem Speichern wird es nur noch verschlüsselt in der Datenbank vorhanden sein.
+    </div>
+</div>
+
+
+
+<script>
+    // Zufälliges Passwort generieren.
+    function generateRandomPassword(length = 12) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%^&*()";
+        let pass = "";
+        for (let i = 0; i < length; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return pass;
+    }
+
+    // Button zum Generieren.
+    document.getElementById("generateTempPassword").addEventListener("click", function () {
+        const pass = generateRandomPassword();
+        document.getElementById("tempPasswordField").value = pass;
+        document.getElementById("tempPasswordInput").value = pass;
+    });
+</script>

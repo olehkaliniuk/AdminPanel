@@ -1,21 +1,218 @@
-﻿/* AdminPanelDB.styles.css */
+﻿/* ---------- Schwarz. ---------- */
+:root {
+    /* Body / Text */
+    --color-bg: #121212;
+    --color-text: #e0e0e0;
+    /* Header / Navbar */
+    --color-header-bg: #1f1f1f;
+    --color-header-text: #e0e0e0;
+    --color-header-link-hover: #bbbbbb;
+    --color-header-last: #aaaaaa;
+    --color-navbar-active-bg: #333333;
+    --color-navbar-hover-bg: #2a2a2a;
+    /* Main / Container */
+    --color-main-bg: #1e1e1e;
+    /* Table */
+    --color-table-bg: #1f1f1f;
+    --color-table-header-bg: #2a2a2a;
+    --color-table-border: #333;
+    --color-table-hover: #2f2f2f;
+    /* Inputs / Select */
+    --color-input-bg: #1f1f1f;
+    --color-input-border: #444;
+    --color-input-focus-bg: #2a2a2a;
+    --color-placeholder: #999;
+    /* Buttons */
+    --color-btn-bg: #2a2a2a;
+    --color-btn-border: #444;
+    --color-btn-hover-bg: #3b3b3b;
+    --color-btn-delete-bg: #7f1d1d;
+    --color-btn-delete-border: #a33;
+    --color-btn-delete-hover-bg: #a33;
+    --color-btn-delete-hover-border: #d22;
+    --color-btn-create-bg: #1f4f7f;
+    --color-btn-create-border: #346;
+    --color-btn-create-hover-bg: #346;
+    --color-btn-create-hover-border: #1f4f7f;
+    --color-btn-text: #e0e0e0;
+    --color-btn-create-text: #fff;
+    /* Misc */
+    --color-config-info: #aaaaaa;
+    /* change Modus btn */
+    --color-btn-m--bg: #2a2a2a;
+    --color-btn-m-text: #e0e0e0;
+    /* Checkbox */
+    --color-checkbox-border: #555;
+    --color-checkbox-bg: #121212;
+    --color-checkbox-checked-bg: #1f4f7f;
+    --color-checkbox-check: #fff;
+}
 
-/* Grundlegender Body-Stil */
+/* ---------- Weiß. ---------- */
+body.light-theme {
+    /* Body / Text */
+    --color-bg: #ffffff;
+    --color-text: #0a0a0a;
+    /* Header / Navbar */
+    --color-header-bg: #f9f9f9;
+    --color-header-text: #111111;
+    --color-header-link-hover: #000000;
+    --color-header-last: #666666;
+    --color-navbar-active-bg: #efefef;
+    --color-navbar-hover-bg: #f5f5f5;
+    /* Main / Container */
+    --color-main-bg: #ffffff;
+    /* Table */
+    --color-table-bg: #ffffff;
+    --color-table-header-bg: #f7f7f7;
+    --color-table-border: #e2e2e2;
+    --color-table-hover: #fafafa;
+    /* Inputs / Select */
+    --color-input-bg: #ffffff;
+    --color-input-border: #d0d0d0;
+    --color-input-focus-bg: #fcfcfc;
+    --color-placeholder: #999999;
+    /* Buttons */
+    --color-btn-bg: #f5f5f5;
+    --color-btn-border: #d0d0d0;
+    --color-btn-hover-bg: #ebebeb;
+    --color-btn-text: #111111;
+    --color-btn-create-bg: #007aff;
+    --color-btn-create-border: #0070f3;
+    --color-btn-create-hover-bg: #0066e0;
+    --color-btn-create-hover-border: #0056c9;
+    --color-btn-create-text: #ffffff;
+    --color-btn-delete-bg: #ff3b30;
+    --color-btn-delete-border: #e02b22;
+    --color-btn-delete-hover-bg: #d62820;
+    --color-btn-delete-hover-border: #b5201a;
+    /* Misc */
+    --color-config-info: #555555;
+    /* Change Modus Button */
+    --color-btn-m--bg: #f5f5f5;
+    --color-btn-m-text: #111111;
+    /* Checkbox */
+    --color-checkbox-border: #cccccc;
+    --color-checkbox-bg: #ffffff;
+    --color-checkbox-checked-bg: #007aff;
+    --color-checkbox-check: #ffffff;
+}
+
+/* ---------- Blau. ---------- */
+body.blue-theme {
+    /* Body / Text */
+    --color-bg: #d3dceb;
+    --color-text: #0a1829;
+    /* Header / Navbar */
+    --color-header-bg: #b9c7de;
+    --color-header-text: #0a1829;
+    --color-header-link-hover: #072043;
+    --color-header-last: #4f678a;
+    --color-navbar-active-bg: #a8bad9;
+    --color-navbar-hover-bg: #b6c5e0;
+    /* Main / Container */
+    --color-main-bg: #d3dceb;
+    /* Table */
+    --color-table-bg: #dfe5f0;
+    --color-table-header-bg: #b9c7de;
+    --color-table-border: #8fa1bf;
+    --color-table-hover: #c8d4eb;
+    /* Inputs / Select */
+    --color-input-bg: #e3e8f2;
+    --color-input-border: #9aaccc;
+    --color-input-focus-bg: #d5def0;
+    --color-placeholder: #495a74;
+    /* Buttons */
+    --color-btn-bg: #b9c7de;
+    --color-btn-border: #8fa1bf;
+    --color-btn-hover-bg: #a8bad9;
+    --color-btn-text: #0a1829;
+    --color-btn-create-bg: #3c7dcf;
+    --color-btn-create-border: #3269b5;
+    --color-btn-create-hover-bg: #2f5ea3;
+    --color-btn-create-hover-border: #274f8c;
+    --color-btn-create-text: #ffffff;
+    --color-btn-delete-bg: #b54545;
+    --color-btn-delete-border: #a23a3a;
+    --color-btn-delete-hover-bg: #912f2f;
+    --color-btn-delete-hover-border: #7c2424;
+    /* Misc */
+    --color-config-info: #3a4e6a;
+    /* Change Modus Button */
+    --color-btn-m--bg: #b9c7de;
+    --color-btn-m-text: #0a1829;
+    /* Checkbox */
+    --color-checkbox-border: #7f95b5;
+    --color-checkbox-bg: #d0d8e6;
+    --color-checkbox-checked-bg: #3c7dcf;
+    --color-checkbox-check: #ffffff;
+}
+
+/* ---------- Body / Grundlegendes ---------- */
 body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
-    background-color: #121212; /* dunkles Grau als Hintergrund */
-    color: #e0e0e0; /* helles Grau für Text */
+    font-size: 0.875rem;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     margin: 0;
     padding: 0;
+    transition: font-size 0.2s ease-in-out;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+#themeToggle i {
+    transition: color 0.3s ease, transform 0.3s ease;
 }
 
 
-/* Header / Navbar */
-header {
-    background-color: #1f1f1f;
-    padding: 15px 30px;
+header, footer, nav, .admin-navbar {
+    font-size: inherit;
+}
+
+
+
+
+/* ---------- StartSeite ---------- */
+.startcontainer{
+    margin-top:5px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+
+}
+
+    .startcontainer a {
+        color: #006eff
+    }
+
+.startsecondcont {
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+    .startsecondcont a {
+        color: #006eff;
+        text-decoration: underline;
+        text-decoration-color: #006eff;
+        text-underline-offset: 2px;
+    }
+
+
+
+/* ---------- Header / Navbar ---------- */
+header, .admin-navbar {
+    background-color: var(--color-header-bg);
+    padding: 10px 30px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: inherit;
+    display: flex;
+    gap: 20px;
 }
 
     header ul {
@@ -32,189 +229,253 @@ header {
         }
 
             header ul li a {
-                color: #e0e0e0;
+                color: var(--color-header-text);
                 text-decoration: none;
-                font-weight: 400; /* normaler, seriöser Text */
+                font-weight: 400;
                 transition: color 0.3s ease;
             }
 
                 header ul li a:hover {
-                    color: #bbbbbb; /* dezente Hover-Farbe */
+                    color: var(--color-header-link-hover);
                 }
 
-/* Container Main-Bereich */
+            header ul li:nth-last-child(4) {
+                color: var(--color-header-last);
+            }
+
+    .admin-navbar a {
+        color: var(--color-header-text);
+        text-decoration: none;
+        font-weight: 400;
+        font-size: inherit;
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+
+        .admin-navbar a:hover {
+            background-color: var(--color-navbar-hover-bg);
+            color: var(--color-text);
+        }
+
+        .admin-navbar a.active {
+            background-color: var(--color-navbar-active-bg);
+            color: var(--color-text);
+        }
+
+
+
+/* ---------- Container / Main-Bereich ---------- */
 .container {
     padding: 30px;
 }
 
-/* Hauptinhalt */
 main {
-    background-color: #1e1e1e;
+    background-color: var(--color-main-bg);
     padding: 20px;
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
-/* Listen in Header / User Info */
-header ul li:last-child {
 
-    color: #aaaaaa;
+
+/* ---------- Tabellen ---------- */
+.table-wrapper {
+    height: 60vh;
+    overflow-y: auto;
 }
 
-/* Tabellen */
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #1f1f1f;
-    color: #e0e0e0;
+    background-color: var(--color-table-bg);
+    color: var(--color-text);
     margin-top: 20px;
     border-radius: 4px;
-    overflow: hidden;
-    font-size: 14px;
+    table-layout: fixed;
+    font-size: inherit;
 }
 
-    table th, table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #333;
+    table thead {
+        border: 1px solid var(--color-table-border);
     }
 
+        table thead th {
+            position: sticky;
+            top: 0;
+            background-color: var(--color-table-header-bg);
+            z-index: 5;
+        }
+
     table th {
-        background-color: #2a2a2a;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--color-table-border);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+    }
+
+    table td {
+        padding: 10px 12px;
+        border: 1px solid var(--color-table-border);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+    }
+
+
+
+        table th:hover,
+        table td:hover {
+            white-space: normal;
+            word-break: break-word;
+            overflow: visible;
+            max-width: 100%;
+        }
+
+    table th {
+        background-color: var(--color-table-header-bg);
         font-weight: 500;
+        text-align: left;
     }
 
     table tr:hover {
-        background-color: #2f2f2f;
+        background-color: var(--color-table-hover);
     }
 
-/* Dezente Buttons */
-button, .btn {
-    background-color: #2a2a2a; /* dunkles Grau */
-    color: #e0e0e0;
-    border: 1px solid #444;
-    padding: 6px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s ease, border 0.3s ease;
+.table-footer-wrapper {
+    position: sticky;
+    bottom: 0;
+    padding: 10px 0;
+    border-top: 1px solid var(--color-table-border);
+    z-index: 10;
 }
 
-    button:hover, .btn:hover {
-        background-color: #333333;
-        border-color: #555;
-    }
-
-
-
-
-
-
-
-
-.login{
-    justify-content:center;
-    text-align: center;
-}
-
-.login div{
-    margin:10px;
-
+.table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
 }
 
 
 
 
-
-
-
-
-/* Allgemeine Input-Stile */
+/* ---------- Inputs / Select ---------- */
 input[type="text"],
 input[type="password"],
 input[type="email"],
-input[type="number"] {
+input[type="number"],
+select,
+textarea{
     width: 100%;
-    max-width: 300px;
-    padding: 8px 12px;
+    max-width: 400px;
+    padding: 6px 12px;
     margin: 5px 0;
     border-radius: 6px;
-    border: 1px solid #444;
-    background-color: #1f1f1f;
-    color: #e0e0e0;
-    font-size: 14px;
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-text);
+    font-size: inherit;
     transition: border 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     outline: none;
     box-sizing: border-box;
 }
 
-    /* Fokus-Effekt für Inputs */
-    input[type="text"]:focus,
-    input[type="password"]:focus,
-    input[type="email"]:focus,
-    input[type="number"]:focus {
+    input:focus, select:focus {
         border-color: #555;
-        background-color: #2a2a2a;
+        background-color: var(--color-input-focus-bg);
         box-shadow: inset 0 0 5px rgba(255,255,255,0.1);
     }
 
-/* Platzhalterfarbe */
 input::placeholder {
-    color: #999;
+    color: var(--color-placeholder);
     opacity: 1;
 }
 
-/* Inputs in Formularen zentrieren (optional) */
-.login form input {
-    display: block;
-    margin: 10px auto;
-}
 
-/* Inputs in Tabellen oder Admin-Panel */
+
+/* Inputs Tabellen */
 table input[type="text"] {
-    width: auto;
+    width: 100%; 
+    box-sizing: border-box; 
     padding: 4px 8px;
-    font-size: 14px;
+    font-size: inherit;
     border-radius: 4px;
-    border: 1px solid #444;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    transition: border 0.3s ease, background 0.3s ease;
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-focus-bg);
+    color: var(--color-text);
 }
 
     table input[type="text"]:focus {
         border-color: #555;
-        background-color: #333333;
     }
 
 
 
-/* Inline-Formulare nebeneinander */
-td form {
+
+/* ---------- Buttons ---------- */
+button, .btn, .btn-edit, .btn-delete, .btn-create {
     display: inline-block;
-    margin: 0 5px 0 0; /* Abstand zwischen Buttons */
+    padding: 5px 14px;
+    margin: 2px;
+    font-size: inherit;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-    td form input[type="text"] {
-        width: auto; /* Textfelder kleiner machen, falls nötig */
+button, .btn, .btn-edit {
+    background-color: var(--color-btn-bg);
+    border-color: var(--color-btn-border);
+    color: var(--color-btn-text);
+}
+
+    button:hover, .btn:hover, .btn-edit:hover {
+        background-color: var(--color-btn-hover-bg);
+        border-color: #666;
+    }
+
+.btn-delete {
+    background-color: var(--color-btn-delete-bg);
+    border-color: var(--color-btn-delete-border);
+}
+
+    .btn-delete:hover {
+        background-color: var(--color-btn-delete-hover-bg);
+        border-color: var(--color-btn-delete-hover-border);
+    }
+
+.btn-create {
+    background-color: var(--color-btn-create-bg);
+    border-color: var(--color-btn-create-border);
+    color: var(--color-btn-create-text);
+}
+
+    .btn-create:hover {
+        background-color: var(--color-btn-create-hover-bg);
+        border-color: var(--color-btn-create-hover-border);
     }
 
 
 
 
-/* Контейнер для таблиц */
+/* ---------- Layout Admin ---------- */
 .admin-container {
     display: flex;
-    flex-direction: column; /* колонки ставим друг под другом */
-    gap: 30px; /* расстояние между таблицами */
+    flex-direction: column;
+    gap: 30px;
 }
 
-/* Таблицы занимают всю ширину */
 .admin-left,
 .admin-right {
     width: 100%;
 }
 
-    /* Если таблица широкая, добавляем прокрутку */
     .admin-left table,
     .admin-right table {
         width: 100%;
@@ -224,24 +485,459 @@ td form {
 
 
 
-
-
-/* Стили для select */
-select {
-    background-color: #1e1e1e; /* темный фон, как у таблиц */
-    color: #e0e0e0; /* светлый текст */
-    border: 1px solid #333; /* темная рамка */
-    border-radius: 4px; /* скругление */
-    padding: 6px 12px; /* внутренние отступы */
-    font-size: 14px; /* такой же размер шрифта, как у инпутов */
-    cursor: pointer;
-    transition: background 0.3s ease, border 0.3s ease;
+/* ---------- Forms ---------- */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 50px;
 }
 
-    /* hover и фокус для select */
-    select:hover,
-    select:focus {
-        background-color: #2a2a2a;
-        border-color: #555;
-        outline: none; /* убираем стандартный синий контур */
+    .form-container form input,
+    .form-container form select,
+    .form-container form button,
+    .form-container form textarea {
+        display: block;
+        width: 250px;
+        padding: 8px 12px;
+        margin: 5px 0;
+        border-radius: 6px;
+        border: 1px solid var(--color-input-border);
+        background-color: var(--color-input-bg);
+        color: var(--color-text);
+        font-size: inherit;
+        box-sizing: border-box;
+        font-style: inherit;
+    }
+
+    .form-container form button {
+        background-color: var(--color-btn-bg);
+        color: var(--color-btn-text);
+        border: 1px solid #555;
+    }
+
+        .form-container form button:hover {
+            background-color: var(--color-btn-hover-bg);
+        }
+
+    /* Links <a> */
+    .form-container a {
+        margin-top: 10px;
+        color: var(--color-text);
+        text-decoration: underline;
+        transition: color 0.3s ease;
+    }
+
+        .form-container a:hover {
+            color: var(--color-header-link-hover);
+        }
+
+
+
+/* ---------- Misc ---------- */
+.login {
+    justify-content: center;
+    text-align: center;
+}
+
+    .login div {
+        margin: 10px;
+    }
+
+.config-info {
+    color: var(--color-config-info);
+}
+
+#themeToggle {
+    background-color: var(--color-btn-m--bg);
+    color: var(--color-btn-m-text);
+}
+
+.color-menu {
+    position: absolute;
+    top: -5px;
+    left: 60px;
+    background: var(--color-main-bg);
+    padding: 10px;
+    border: 1px solid;
+    border-color: var(--color-table-border);
+    border-radius: 6px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+    .color-menu.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+
+
+/* ---------- UserCard ---------- */
+.user-data-card {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 20px 25px;
+    border: 1px solid;
+    border-color: var(--color-table-border);
+    border-radius: 12px;
+    background-color: var(--color-table-bg);
+}
+
+    .user-data-card h2 {
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--color-header-border, #ccc);
+        padding-bottom: 8px;
+    }
+
+    .user-data-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .user-data-card li {
+        margin-bottom: 12px;
+        display: flex;
+    }
+
+    .user-data-card .label {
+        font-weight: 600;
+        width: 120px;
+    }
+
+.datenbearbeitenBtn {
+    text-align:center;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 14px;
+    font-size: inherit;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background-color: var(--color-btn-bg);
+    border-color: var(--color-btn-border);
+    color: var(--color-btn-text);
+}
+
+    .datenbearbeitenBtn:hover {
+        background-color: var(--color-btn-hover-bg);
+        border-color: #666;
+    }
+
+
+
+/* ---------- Abteilung Create-form ---------- */
+.addabteilung {
+    padding: 8px 12px;
+}
+
+.abtn {
+    display: inline-block;
+    padding: 4px 14px;
+    margin: 2px;
+    font-size: inherit;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background-color: var(--color-btn-bg);
+    border-color: var(--color-btn-border);
+    color: var(--color-btn-text);
+}
+
+    .abtn:hover {
+        background-color: var(--color-btn-hover-bg);
+        border-color: #666;
+    }
+
+.referat-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.config-panel {
+    background: var(--color-header-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 10px 25px;
+    border: 1px solid;
+    border-color: var(--color-table-border)
+}
+
+.selectim {
+    width: auto;
+    padding: 4px 8px;
+    font-size: inherit;
+    border-radius: 4px;
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-focus-bg);
+    color: var(--color-text);
+}
+
+
+
+
+/* ----------  Checkbox ---------- */
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-checkbox-border);
+    border-radius: 6px;
+    background-color: var(--color-checkbox-bg);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    vertical-align: middle;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+    input[type="checkbox"]:hover {
+        border-color: var(--color-btn-create-bg);
+        box-shadow: 0 2px 6px rgba(31,79,127,0.25);
+    }
+
+    input[type="checkbox"]::after {
+        content: "";
+        position: absolute;
+        top: 0px;
+        left: 6px;
+        width: 6px;
+        height: 12px;
+        border: solid var(--color-checkbox-check);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        opacity: 0;
+        transition: all 0.2s ease;
+    }
+
+    /* Checked */
+    input[type="checkbox"]:checked {
+        background-color: var(--color-checkbox-checked-bg);
+        border-color: var(--color-checkbox-checked-bg);
+    }
+
+        input[type="checkbox"]:checked::after {
+            opacity: 1;
+        }
+
+
+
+/* ---------- Kategorie ---------- */
+.kategorieform {
+    border: 1px solid;
+    border-color: var(--color-table-border);
+    border-radius: 12px;
+    padding: 10px;
+
+}
+
+.kategoriebox {
+    display: none;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.kinfo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.hauptgruppe-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.hgrupenbez {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid;
+    border-color: var(--color-table-border);
+    border-radius: 12px;
+    padding: 10px;
+    background-color: var(--color-table-bg);
+    margin-bottom:10px;
+
+}
+
+.staticfields{
+    display:flex;
+    flex-direction: column;
+}
+
+.adresseBox {
+    border: 1px solid;
+    border-color: var(--color-table-border);
+    border-radius: 12px;
+    padding: 10px;
+    background-color: var(--color-table-bg);
+}
+
+
+
+/* Custom confirm */
+.custom-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Fenster */
+.dialog-box {
+    padding: 25px 30px;
+    width: 350px;
+    max-width: 90%;
+    text-align: center;
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    border: 1px solid;
+    border-color: var(--color-table-border);
+    border-radius: 12px;
+    background-color: var(--color-table-bg);
+}
+
+/* Animation */
+.custom-dialog.show .dialog-box {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Mesage */
+#dialog-message {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Button */
+.dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+    .dialog-buttons button {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+
+
+/* Dropdown Nebengruppe Hauptgruppe disable */
+.readonly-select {
+    pointer-events: none; 
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: default;
+}
+
+
+
+.logs-details {
+    overflow-y: auto;
+    height: 40vh; 
+    margin:0px;
+}
+
+
+
+/* Logs */
+.detailsH2 {
+    border-bottom: 1px solid;
+    border-color: var( --color-text);
+}
+
+
+
+
+
+/* ConfigLogs*/
+.marker-old {
+    background: linear-gradient( transparent 65%, rgba(255, 99, 71, 0.35) 65% /* rot */
+    );
+    padding: 0 3px;
+}
+
+.marker-new {
+    background: linear-gradient( transparent 65%, rgba(60, 179, 113, 0.35) 65% /* grün */
+    );
+    padding: 0 3px;
+}
+
+.marker-update {
+    background: linear-gradient( transparent 65%, rgba(255, 215, 0, 0.35) 65% /* gelb */
+    );
+    padding: 0 3px;
+}
+
+/* MODAL ConfigLogs*/
+.modal {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px); /* Safari */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+ 
+    z-index: 9999;
+}
+
+    .modal.hidden {
+        display: none;
+    }
+
+.modal-content {
+    width: 70%;
+    max-height: 80%;
+    overflow: auto;
+    border-radius: 6px;
+    padding:10px;
+
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.diff-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .diff-table th,
+    .diff-table td {
+        padding: 6px;
     }

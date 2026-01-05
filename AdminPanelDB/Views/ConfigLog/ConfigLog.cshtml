@@ -1,0 +1,283 @@
+﻿@model List<AdminPanelDB.Models.ConfigLog>
+
+@Html.Partial("_AdminNavbar")
+
+
+<div class="admin-right">
+    <div style="display:flex; gap:20px; text-align:center; align-items:center; margin-top:20px;">
+
+        <h2>Config Logs</h2>
+        <div id="error-box" style="font-weight:bold; margin-top: 7px;
+         color:@(TempData["MessageType"]?.ToString() == "success" ? "green" :
+                                            TempData["MessageType"]?.ToString() == "error" ? "red" : "blue")">
+
+            @TempData["Message"]
+        </div>
+
+    </div>
+
+
+  <form method="get" asp-controller="ConfigLog" asp-action="ConfigLog" id="filterForm">
+  <div class="table-wrapper">
+  <table id="configLogTable">
+  <thead>
+         <tr>
+            @{
+                string GetSortDirection(string column)
+                {
+                    if(ViewBag.Filters?.sortColumn == column)
+                    {
+                        return ViewBag.Filters.sortDirection == "ASC" ? "DESC" : "ASC";
+                    }
+                    return "ASC";
+                }
+
+                string GetSortArrow(string column)
+                {
+                    if(ViewBag.Filters?.sortColumn == column)
+                    {
+                        return ViewBag.Filters.sortDirection == "ASC" ? "▲" : "▼";
+                    }
+                    return "●";
+                }
+
+                object GetSortLinkParams(string column)
+                {
+                    return new {
+                        sortColumn = column,
+                        sortDirection = GetSortDirection(column),
+                        page = ViewBag.Page,
+                        pageSize = ViewBag.PageSize,
+                        tabelleKey = ViewBag.Filters?.tabelleKey,
+                        tabelleName = ViewBag.Filters?.tabelleName,
+                        aktion = ViewBag.Filters?.aktion,
+                        alterWert = ViewBag.Filters?.alterWert,
+                        neuerWert = ViewBag.Filters?.neuerWert,
+                        geaendertVon = ViewBag.Filters?.geaendertVon,
+                        geaendertAm = ViewBag.Filters?.geaendertAm
+                    };
+                }
+            }
+
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("TabelleKey"))">TabelleKey @GetSortArrow("TabelleKey")</a></th>   
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("TabelleName"))">TabelleName @GetSortArrow("TabelleName")</a></th>
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("Aktion"))">Aktion @GetSortArrow("Aktion")</a></th>
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("AlterWert"))">AlterWert @GetSortArrow("AlterWert")</a></th>
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("NeuerWert"))">NeuerWert @GetSortArrow("NeuerWert")</a></th>
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("GeaendertVon"))">GeaendertVon @GetSortArrow("GeaendertVon")</a></th>
+            <th><a href="@Url.Action("ConfigLog", GetSortLinkParams("GeaendertAm"))">GeaendertAm @GetSortArrow("GeaendertAm")</a></th>
+            <th>Aktionen</th>
+       </tr>
+
+       <tr class="filter-row">
+            <th><input type="text" name="TabelleKey" value="@ViewBag.Filters?.tabelleKey" placeholder="Filter tabelleKey" /></th>
+            <th><input type="text" name="TabelleName" value="@ViewBag.Filters?.tabelleName" placeholder="Filter tabelleName" /></th>
+            <th>
+                <select name="aktion" onchange="document.getElementById('pageInput').value=1; document.getElementById('filterForm').submit();" style="padding:4px 6px; margin:0px; width:100px;" class="selectim">
+                @{
+                var aktionOptions = new[] {
+                    new { Value = "", Text = "Alle" },
+                    new { Value = "Aktualisieren", Text = "Aktualisieren" },
+                    new { Value = "Löschen", Text = "Löschen" },
+                    new { Value = "Erstellen", Text = "Erstellen" }
+                };
+
+                foreach (var opt in aktionOptions)
+                {
+                    var isSelected = (ViewBag.Filters?.aktion == opt.Value) ? "selected" : "";
+                    @:<option value="@opt.Value" @isSelected>@opt.Text</option>
+                }
+                }
+                </select>
+            </th>
+
+            <th><input type="text" name="alterWert" value="@ViewBag.Filters?.alterWert" placeholder="Filter alterWert" /></th>
+            <th><input type="text" name="neuerWert" value="@ViewBag.Filters?.neuerWert" placeholder="Filter neuerWert" /></th>
+            <th><input type="text" name="geaendertVon" value="@ViewBag.Filters?.geaendertVon" placeholder="Filter geaendertVon" /></th>
+            <th><input type="text" name="geaendertAm" value="@ViewBag.Filters?.geaendertAm" placeholder="Filter geaendertAm" /></th>
+
+            <th>
+                <button type="submit" class="btn"  onclick="document.getElementById('pageInput').value = 1;"><i class="fas fa-magnifying-glass"></i></button>
+                <a asp-action="ConfigLog" class="abtn">  <i class="fas fa-rotate-left"></i></a>
+            </th>
+       </tr>
+
+  </thead>
+
+
+  <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var log in Model)
+                {
+                    <tr id="row-@log.Id" data-old='@log.AlterWert' data-new='@log.NeuerWert' class="log-row">
+                        <td>@log.TabelleKey</td>
+                        <td>@log.TabelleName</td>
+                        <td>@log.Aktion</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(log.AlterWert))
+                            {
+                                var oldClass = log.Aktion == "Aktualisieren"
+                                    ? "marker-update"
+                                    : "marker-old";
+
+                                <span class="@oldClass">@log.AlterWert</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(log.NeuerWert))
+                            {
+                                <span class="marker-new">@log.NeuerWert</span>
+                            }
+                        </td>
+
+                        <td>@log.GeaendertVon</td>
+                        <td>@log.GeaendertAm.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td></td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="8" style="text-align:center;">Keine Einträge gefunden</td></tr>
+            }
+  </tbody>
+  </table>
+
+  </div>
+
+  <!-- Pagination. -->
+  <div class="table-footer-wrapper">
+        <div class="table-footer">
+
+        <label>Anzahl der Einträge:</label>
+        <input readonly type="number" value="@ViewBag.TotalCount" class="anzahl" style="width:60px; padding:5px;"/>
+             
+        @if (ViewBag.Page > 1)
+        {
+            <button type="submit" name="page" value="1" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+        }
+
+        @if (ViewBag.Page > 1)
+        {
+            <button type="submit" name="page" value="@(ViewBag.Page - 1)" class="btn btn-outline-secondary">    <i class="fas fa-arrow-left"></i></button>
+        }
+
+        <span>Seite @ViewBag.Page von @ViewBag.TotalPages</span>
+
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <button type="submit" name="page" value="@(ViewBag.Page + 1)" class="btn btn-outline-secondary">  <i class="fas fa-arrow-right"></i></button>
+        }
+
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <button type="submit" name="page" value="@ViewBag.TotalPages" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        }
+
+        <label for="pageInput">Gehe zu:</label>
+        <input type="number" id="pageInput" name="page" min="1" max="@ViewBag.TotalPages" value="@ViewBag.Page" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.form.submit();}" style="width:60px; padding:5px;" />
+        
+        <!-- Zeilen pro Seite. -->
+        <label for="pageSizeSelect">Zeilen pro Seite:</label>
+
+        <select name="pageSize" onchange="onPageSizeChange(this.value)" style="padding:4px 6px; width:60px;">
+                    @{
+                        int[] sizes = { 1, 5, 10, 20, 9999 };
+                        foreach (var size in sizes)
+                        {
+                            var isSelected = ViewBag.PageSize == size ? "selected" : "";
+                            var displayText = size == 9999 ? "Alle" : size.ToString();
+                            @:<option value="@size" @isSelected>@displayText</option>
+                }
+            }
+        </select>
+
+       <button type="submit" class="btn"><i class="fas fa-check"></i></button>
+
+        <a asp-action="ConfigLog" class="abtn"><i class="fas fa-rotate-left"></i></a>
+  </div>
+  </div>
+
+  </form>
+</div>
+
+
+                            <div id="diffModal" class="modal hidden">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <span>Unterschiede</span>
+            <button id="closeModal">✖</button>
+        </div>
+
+        <div class="modal-body">
+            <table class="diff-table">
+                <thead>
+                    <tr>
+                        <th>Feld</th>
+                        <th>Alt</th>
+                        <th>Neu</th>
+                    </tr>
+                </thead>
+                <tbody id="diffBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+<script>
+//Unterschied anzeige MODAL.
+document.addEventListener("DOMContentLoaded", function () {
+
+    const modal = document.getElementById("diffModal");
+    const closeBtn = document.getElementById("closeModal");
+    const tbody = document.getElementById("diffBody");
+
+    closeBtn.onclick = () => modal.classList.add("hidden");
+    modal.onclick = e => {
+        if (e.target === modal) modal.classList.add("hidden");
+    };
+
+    document.querySelectorAll(".log-row").forEach(row => {
+        row.addEventListener("click", function () {
+
+            const oldJson = this.dataset.old;
+            const newJson = this.dataset.new;
+
+            if (!oldJson || !newJson) return;
+
+            const oldObj = JSON.parse(oldJson);
+            const newObj = JSON.parse(newJson);
+
+            tbody.innerHTML = "";
+
+            Object.keys(newObj).forEach(key => {
+                if (oldObj[key] !== newObj[key]) {
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${key}</td>
+                        <td>${oldObj[key] ?? "-"}</td>
+                        <td>${newObj[key] ?? "-"}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+
+            modal.classList.remove("hidden");
+        });
+    });
+
+});
+</script>

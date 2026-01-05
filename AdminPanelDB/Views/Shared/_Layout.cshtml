@@ -4,34 +4,146 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - AdminPanelDB</title>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/AdminPanelDB.styles.css" asp-append-version="true" />
+    <script>
+         const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const html = document.documentElement;
+                const currentTheme = ['dark', 'light', 'blue'].find(t => html.classList.contains(t + '-theme'));
+                let nextTheme;
+                switch (currentTheme) {
+                    case 'dark': nextTheme = 'light'; break;
+                    case 'light': nextTheme = 'blue'; break;
+                    default: nextTheme = 'dark'; break;
+                }
+                // Entferne alle bisherigen Themes.
+                html.classList.remove('dark-theme', 'light-theme', 'blue-theme');
+
+                // Neues Theme hinzufügen.
+                html.classList.add(nextTheme + '-theme');
+
+                // Speichere Auswahl im LocalStorage.
+                localStorage.setItem('theme', nextTheme);
+            });
+        }
+    </script>
 </head>
 <body>
-    <header>
-      
-        <div>
-    <ul>
-        @if (Context.Session.GetString("UserName") == null)
-        {
-            <li><a asp-controller="Auth" asp-action="Login">Login</a></li>
-        }
-        else
-        {
-            <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
-            <li><a asp-controller="User" asp-action="UserData">User Page</a></li>
+    <div id="custom-dialog" class="custom-dialog">
+        <div class="dialog-box">
+            <div id="dialog-message"></div>
+            <div class="dialog-buttons">
+                <button id="dialog-ok">OK</button>
+                <button id="dialog-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-            var isAdmin = Context.Session.GetString("UserEmail") ?? "";
-            if (isAdmin.Split(',').Any(r => r.Trim().Equals("admin@gmail.com", StringComparison.OrdinalIgnoreCase)))
-            {
-                <li><a asp-controller="Admin" asp-action="AbRef">Admin Panel</a></li>
+    <script>
+        (function() {
+            const dialog = document.getElementById("custom-dialog");
+            const msgBox = document.getElementById("dialog-message");
+            const okBtn = document.getElementById("dialog-ok");
+            const cancelBtn = document.getElementById("dialog-cancel");
+
+            function showDialog(message, showCancel) {
+                return new Promise(resolve => {
+                    msgBox.textContent = message;
+                    if(showCancel) {
+                        cancelBtn.style.display = "inline-block";
+                    } else {
+                        cancelBtn.style.display = "none";
+                    }
+
+                    dialog.classList.add("show");
+                    dialog.style.display = "flex";
+
+                    okBtn.onclick = () => {
+                        dialog.classList.remove("show");
+                        setTimeout(() => { dialog.style.display = "none"; }, 200);
+                        resolve(true);
+                    };
+
+                    cancelBtn.onclick = () => {
+                        dialog.classList.remove("show");
+                        setTimeout(() => { dialog.style.display = "none"; }, 200);
+                        resolve(false);
+                    };
+                });
             }
-             <li>User: @Context.Session.GetString("UserEmail")</li>
- 
-        }
-    </ul>
-</div>
+
+            // Überschreiben global.
+            window.alert = function(message) {
+                return showDialog(message, false);
+            };
+
+            window.confirm = function(message) {
+                return showDialog(message, true);
+            };
+        })();
+    </script>
+
+
+    <header>
+
+        <div>
+
+            <ul>
+                @if (Context.Session.GetString("UserName") == null)
+                {
+                    <li><a asp-controller="Auth" asp-action="Login">Anmelden</a></li>
+                }
+                else
+                {
+                    <li><a asp-controller="Auth" asp-action="Logout">Abmelden</a></li>
+                    <li><a asp-controller="User" asp-action="UserData">Benutzer</a></li>
+
+                    var isAdmin = Context.Session.GetString("Rolle") ?? "";
+                    if (isAdmin.Split(',').Any(r => r.Trim().Equals("Administrator", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        <li><a asp-controller="Admin" asp-action="AbRef">Administrationsbereich</a></li>
+                    }
+                    <li>
+                        <i class="fa-solid fa-user" style="margin-right:5px;"></i> @Context.Session.GetString("UserEmail")
+                        @if (Context.Session.GetInt32("IstAdmin") == 1)
+                        {
+                        <i class="fa-solid fa-crown" style="color:gold;"></i>
+                        }
+                    
+                    </li>
+                   
+                   
+
+                }
+                <li>
+                    <!-- Toggle theme. -->
+                    <button id="themeToggle" title="Thema wechseln">
+                    </button>
+
+                </li>
+                <li style="position: relative;">
+                    <button id="colorMenuToggle"><i class="fas fa-palette"></i></button>
+                    <div id="colorMenu" class="color-menu">
+                        <input type="color" id="colorPicker" value="#2a2a2a" />
+                        <button id="resetColorBtn"><i class="fas fa-xmark"></i></button>
+                    </div>
+                </li>
+                <li>
+
+
+                    <select name="font" id="fontselector">
+                        <option value="0.875">100%</option>
+                        <option value="1">125%</option>
+                        <option value="1.25">150%</option>
+                        <option value="1.5">175%</option>
+                        <option value="2">200%</option>
+                    </select>
+                </li>
+
+            </ul>
+        </div>
 
 
     </header>
@@ -41,9 +153,17 @@
         </main>
     </div>
 
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/AbRef.js" asp-append-version="true"></script>
+    <script src="~/js/Config.js" asp-append-version="true"></script>
+    <script src="~/js/Personen.js" asp-append-version="true"></script>
+    <script src="~/js/KaGruppen.js" asp-append-version="true"></script>
+    <script src="~/js/Adresse.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

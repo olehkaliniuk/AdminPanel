@@ -1,0 +1,388 @@
+﻿@model AdminPanelDB.ViewModels.KaGruppenPageViewModel
+
+@Html.Partial("_AdminNavbar")
+
+
+
+<div class="admin-right">
+
+    <div style="display:flex; gap:20px; text-align:center; align-items:center; margin-top:20px;">
+
+    <h2>Kategorien & Gruppe</h2>
+    <div id="error-box" style="font-weight:bold; margin-top: 7px;
+         color:@(TempData["MessageType"]?.ToString() == "success" ? "green" :
+                TempData["MessageType"]?.ToString() == "error" ? "red" : "blue")">
+
+        @TempData["Message"]
+    </div>
+
+    </div>
+
+    <form method="get" asp-action="KaGruppen" style="margin-bottom:10px;" id="mainForm">
+
+    <div class="kategorieform">
+        <select name="kategorieNummer" onchange="this.form.submit()">
+            @foreach (var kat in (List<Kategorie>)ViewBag.Kategorien)
+            {
+            @if (kat.KategorieNummer == (int?)ViewBag.SelectedKategorieNummer)
+            {
+                <option value="@kat.KategorieNummer" selected><strong>Kategorie:</strong> @kat.Bezeichnung</option>
+            }
+            else
+            {
+                <option value="@kat.KategorieNummer"><strong>Kategorie:</strong> @kat.Bezeichnung</option>
+            }
+
+            }
+        </select>
+
+    <!-- Toggle Kategorie. -->
+    <button id="toggleBtn" type="button" onclick="toggleKategorie('kategorieInfo', this)">
+        <i class="fas fa-eye"></i>
+    </button>
+
+    <!-- Create Kategorie. -->
+    <a asp-controller="KaGruppen" asp-action="CreateKategorie" class="abtn"><i class="fas fa-plus"></i></a>
+
+    <!-- Kategorie. -->
+    @if (ViewBag.SelectedKategorieNummer  != null)
+    {
+        var selectedKat = ((List<Kategorie>)ViewBag.Kategorien)
+            .FirstOrDefault(k => k.KategorieNummer == (int)ViewBag.SelectedKategorieNummer);
+
+        if (selectedKat != null)
+        {
+            <div class="kategoriebox" id="kategorieInfo">
+                <div class="kinfo">
+                <p><strong>Bezeichnung:</strong> @selectedKat.Bezeichnung</p>
+                <p><strong>Kürzel:</strong> @selectedKat.Kuerzel</p>
+                <p><strong>Beschreibung:</strong> @selectedKat.Beschreibung</p>
+                <p><strong>KategorieNummer:</strong> @selectedKat.KategorieNummer</p>
+                <p style="margin-top:17px;"><strong>IstAktiv:</strong><input type="checkbox" disabled @(selectedKat.IstAktiv ? "checked" : "") class="form-check-input"></p>
+                <p style="margin-top:17px;"><strong>IstTestKategorie:</strong> <input type="checkbox" disabled @(selectedKat.IstTestKategorie ? "checked" : "") class="form-check-input"></p>
+                <!-- Edit Kategorie. -->
+                <a asp-controller="KaGruppen" asp-action="EditKategorie" asp-route-id="@selectedKat.Id" class="abtn">
+                    <i class="fas fa-pen"></i>
+                </a>
+
+                <!-- Delete Kategorie. -->
+                <input type="hidden" name="id" value="@selectedKat.Id" />
+                @Html.AntiForgeryToken()
+                <button type="button" class="btn" onclick="deleteKategorie(@selectedKat.Id)">
+                    <i class="fas fa-trash"></i>
+                </button>
+                </div>
+            </div>
+        }
+    }
+
+    </div>
+
+    <div class="table-wrapper">
+        <table id="kaTable">
+            <thead>
+                 @{
+                // Richtung nur umschalten, wenn bereits geklickt.
+              string GetSortDirection(string column)
+{
+                // Wenn noch keine Sortierung gesetzt oder andere Spalte  ASC.
+                if (string.IsNullOrEmpty(Model.SortColumn) || Model.SortColumn != column)
+                {
+                    return "ASC"; // Klick erstmal aufsteigend.
+                }
+                // Wenn aktuelle Spalte  umschalten.
+                return (Model.SortDirection == "ASC") ? "DESC" : "ASC";
+                }
+
+
+              string GetSortArrow(string column)
+{
+                    if (string.IsNullOrEmpty(Model.SortColumn) || Model.SortColumn != column)
+                    {
+                        return "●"; 
+                    }
+                    return (Model.SortDirection == "ASC") ? "▲" : "▼";
+                }
+
+
+               object GetSortLinkParams(string column) => new
+                {
+                    sortColumn = column,
+                    sortDirection = GetSortDirection(column),
+                    pageNumber = Model.HauptGruppen?.PageIndex ?? 1,
+                    pageSize = Model.HauptGruppen?.PageSize ?? 10,
+                    hauptgruppeSearchTerm = Model.HauptgruppeSearchTerm ?? "",
+                    nebengruppeSearchTerm = Model.NebengruppeSearchTerm ?? "",
+                    kategorieNummer = ViewBag.SelectedKategorieNummer
+                };
+
+                }
+
+                <tr>
+                    <th>
+                        <a href="@Url.Action("KaGruppen", GetSortLinkParams("HauptgruppeNummer"))">
+                            Hauptgruppe @GetSortArrow("HauptgruppeNummer")
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" onclick="sortNebengruppeGlobal(); return false;" id="nebengruppeSortLink">
+                            Nebengruppe <span id="nebengruppeSortArrow">●</span>
+                        </a>
+                
+                    </th>
+                    <th>Aktionen</th>
+                </tr>
+                    <!-- Filter nach Abteilung. -->
+                    <tr class="filter-row">
+                        <th>
+                            <input type="text" name="hauptgruppeSearchTerm" placeholder="Suche Hauptgruppe..."
+                                   value="@Model.HauptgruppeSearchTerm" style="width: 100%; padding:4px;" />
+                        </th>
+                        <th>
+                            <input type="text" name="nebengruppeSearchTerm" placeholder="Suche Nebengruppe..."
+                                   value="@Model.NebengruppeSearchTerm" style="width: 100%; padding:4px;" />
+               
+                        </th>
+                        <th>
+                            <button type="submit" class="btn" onclick="document.getElementById('pageNumberInput').value = 1;"><i class="fas fa-magnifying-glass"></i></button>
+                            <a asp-action="KaGruppen"  asp-route-kategorieNummer="@ViewBag.SelectedKategorieNummer"  class="abtn"><i class="fas fa-rotate-left"></i></a>
+                        </th>
+                    </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.HauptGruppen != null && Model.HauptGruppen.Any())
+                {
+                    foreach (var gruppe in Model.HauptGruppen)
+                    {
+                        var haupt = gruppe.Hauptgruppen!.FirstOrDefault();
+                        <tr  id="row-@haupt.Id">
+                            <!-- Hauptgruppe. -->
+                            <td>
+                                <div class="hgrupenbez">
+                                    <div style="display:flex; gap:10px;">
+                               <p><strong>Bezeichnung:</strong>@haupt?.Bezeichnung</p>
+                              
+
+                                </div>
+                                <!-- Toggle Hauptgruppe. -->
+                                <button id="toggleBtn" type="button" onclick="toggleHauptgruppe('hauptgruppeInfo_@haupt.Id', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                </div>
+
+                                 <div class="kategoriebox" id="hauptgruppeInfo_@haupt.Id">
+                                    <table>
+                                        <tbody>
+                                            <tr><td>GehoertZuKategorie</td><td>@haupt?.GehoertZuKategorie</td></tr>
+                                            <tr><td>Kuerzel</td><td>@haupt?.Kuerzel</td></tr>
+                                            <tr><td>Beschreibung</td><td>@haupt?.Beschreibung</td></tr>
+                                            <tr><td>HauptgruppeNummer</td><td>@haupt?.HauptgruppeNummer</td></tr>
+                                            <tr><td>LaufenderAktenzeichenZaehler</td><td>@haupt?.LaufenderAktenzeichenZaehler</td></tr>
+                                            <tr>
+                                                <td>IstAktiv</td>
+                                                <td><input type="checkbox" disabled @(haupt.IstAktiv ? "checked" : "") class="form-check-input"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>IstTestGruppe</td>
+                                                <td><input type="checkbox" disabled @(haupt.IstTestGruppe ? "checked" : "") class="form-check-input"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="text-center">
+                                                  <a asp-action="EditHauptgruppe" 
+                                                       asp-route-id="@haupt.Id"
+                                                        asp-route-pageNumber="@Model.HauptGruppen.PageIndex"
+                                                        asp-route-pageSize="@Model.PageSize"
+                                                    
+                      
+                                                       class="abtn">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
+
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteHauptgruppe(@haupt.Id)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+
+                            <!-- Nebengruppe. -->
+                          <td>
+                         <div class="referate-list" style="height: @(gruppe.Nebengruppen.Count > 2 ? "120px" : "auto"); resize: vertical; overflow: auto;">
+
+
+
+                            @if (gruppe.Nebengruppen != null && gruppe.Nebengruppen.Any())
+                            {
+                          
+
+                                <div id="nebengruppeContainer">
+                                    @foreach (var neben in gruppe.Nebengruppen)
+                                    {
+                                        <div class="nebengruppe-item" data-nummer="@neben.NebengruppeNummer">
+                                            <div class="hgrupenbez">
+                                                <div style="display:flex; gap:10px;">  
+                                                    <p><strong>Bezeichnung:</strong>@neben.Bezeichnung</p>
+                                 
+                                                </div>
+
+                                                <!-- Toggle Nebengruppe. -->
+                                                <button id="toggleBtn" type="button" onclick="toggleNebengruppe('nebengruppeInfo_@neben.Id', this)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="kategoriebox" id="nebengruppeInfo_@neben.Id">
+                                                <table>
+                                                    <tbody>
+                                                        <tr><td>GehoertZuKategorie</td><td>@neben.GehoertZuKategorie</td></tr>
+                                                        <tr><td>GehoertZuHauptgruppe</td><td>@neben.GehoertZuHauptgruppe</td></tr>
+                                                        <tr><td>Kuerzel</td><td>@neben.Kuerzel</td></tr>
+                                                        <tr><td>Beschreibung</td><td>@neben.Beschreibung</td></tr>
+                                                        <tr><td>NebengruppeNummer</td><td>@neben.NebengruppeNummer</td></tr>
+                                                        <tr>
+                                                            <td>IstAktiv</td>
+                                                            <td><input type="checkbox" disabled @(neben.IstAktiv ? "checked" : "") class="form-check-input"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>IstTestGruppe</td>
+                                                            <td><input type="checkbox" disabled @(neben.IstTestGruppe ? "checked" : "") class="form-check-input"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2" class="text-center">
+                                                                <a asp-action="EditNebengruppe" asp-route-id="@neben.Id" asp-route-kategorieNummer="@ViewBag.SelectedKategorieNummer" asp-route-hauptgruppeNummer="@haupt?.HauptgruppeNummer" asp-route-pageSize="@ViewBag.PageSize" asp-route-pageNumber="@ViewBag.PageNumber" class="abtn">
+                                                                    <i class="fas fa-pen"></i>
+                                                                </a>
+                                   
+                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteNebengruppe(@neben.Id)">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div>Keine Nebengruppen</div>
+                            }
+                            </div>
+                          
+                            </td>
+
+                            <td>
+                                 <!-- Create Nebengruppe. -->
+                                 <a asp-action="CreateNebengruppe" asp-route-kategorieNummer="@ViewBag.SelectedKategorieNummer" asp-route-hauptgruppeNummer="@haupt?.HauptgruppeNummer"  asp-route-pageSize="@ViewBag.PageSize" asp-route-pageNumber="@ViewBag.PageNumber" class="addabteilung btn">
+                                    <i class="fas fa-plus"></i>
+                                 </a>
+                            </td>
+         
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" style="text-align:center;">Keine Einträge gefunden.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
+     <!-- Paginierung unter der Tabelle. -->
+    <div class="table-footer-wrapper">
+        <div class="table-footer">
+
+        <label>Anzahl der Einträge:</label>
+        <input readonly type="number" value="@ViewBag.TotalCount" style="width:60px; padding:5px;"/>
+
+        <!--  Erste Seite -->
+        @if (Model.HauptGruppen.PageIndex > 1)
+        {
+            <button type="submit" name="pageNumber" value="1" class="btn btn-outline-secondary" title="Erste Seite">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+        }
+
+        <!-- Vorherige Seite -->
+        @if (Model.HauptGruppen.PageIndex > 1)
+        {
+            <button type="submit" name="pageNumber" value="@(Model.HauptGruppen.PageIndex - 1)" class="btn btn-outline-secondary" title="Vorherige Seite">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        }
+
+        <!-- Aktuelle Seite. -->
+        <span>Seite @Model.HauptGruppen.PageIndex von @Model.HauptGruppen.TotalPages</span>
+
+        <!-- Nächste Seite. -->
+        @if (Model.HauptGruppen.PageIndex < Model.HauptGruppen.TotalPages)
+        {
+            <button type="submit" name="pageNumber" value="@(Model.HauptGruppen.PageIndex + 1)" class="btn btn-outline-secondary" title="Nächste Seite">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        }
+
+        <!-- Letzte Seite. -->
+        @if (Model.HauptGruppen.PageIndex < Model.HauptGruppen.TotalPages)
+        {
+            <button type="submit" name="pageNumber" value="@Model.HauptGruppen.TotalPages" class="btn btn-outline-secondary" title="Letzte Seite">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        }
+
+        <label for="pageNumberInput">Gehe zu:</label>
+        <input type="number" id="pageNumberInput"
+               name="pageNumber"
+               min="1"
+               max="@Model.HauptGruppen.TotalPages"
+               value="@Model.HauptGruppen.PageIndex"
+               onkeydown="if(event.key==='Enter'){event.preventDefault(); this.form.submit();}"
+               style="width:60px; padding:5px;" />
+    
+
+        <!-- Zeilen pro Seite. -->
+        <label>Zeilen pro Seite:</label>
+        <select id="PageSizeInput" name="pageSize" onchange="onPageSizeChange()" style="padding:4px 6px;  width:60px;">
+            @{
+                int[] sizes = {1, 5, 10, 20, 9999};
+                foreach (var size in sizes)
+                {
+                    var isSelected = Model.HauptGruppen.PageSize == size ? "selected" : "";
+                    var displayText = size == 9999 ? "Alle" : size.ToString();
+                    @:<option value="@size" @isSelected>@displayText</option>
+                }
+            }
+        </select>
+
+        <!-- go to. -->
+        <button type="submit" class="btn"><i class="fas fa-check"></i></button>
+
+        <!-- Reset. -->
+         <a asp-action="KaGruppen"  asp-route-kategorieNummer="@ViewBag.SelectedKategorieNummer"  class="abtn"><i class="fas fa-rotate-left"></i></a>
+        </div>
+    </div>
+    </form>
+
+
+    <!-- Neue Hauptgruppe. -->
+    <a asp-action="CreateHauptgruppe" asp-route-kategorieNummer="@ViewBag.SelectedKategorieNummer"  class="addabteilung btn">
+    <i class="fas fa-plus"></i>
+    </a>
+
+</div>
+
+
+
+
+
+

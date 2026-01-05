@@ -1,4 +1,5 @@
-﻿using AdminPanelDB.Models;
+﻿using AdminPanelDB.Exeptions;
+using AdminPanelDB.Models;
 using Microsoft.Data.SqlClient;
 
 namespace AdminPanelDB.Repository
@@ -13,49 +14,55 @@ namespace AdminPanelDB.Repository
         }
 
 
-
+        // UserPage.
         public Personen GetUserByEmail(string email)
         {
-            Personen user = null;
-
-            using (var connection = new SqlConnection(_connectionString))
+            try
             {
-                connection.Open();
+                Personen user = null;
 
-                var query = @"
-        SELECT u.Id, u.Titel, u.Name, u.Vorname, u.Email, u.Abteilung, u.Referat, u.Stelle, u.Kennwort
-        FROM [Personen] u
-        WHERE u.Email = @Email";
-
-                using (var command = new SqlCommand(query, connection))
+                using (var connection = new SqlConnection(_connectionString))
                 {
-                    command.Parameters.AddWithValue("@Email", email);
+                    connection.Open();
 
-                    using (var reader = command.ExecuteReader())
+                    var query = @"
+                                SELECT u.Id, u.Titel, u.Name, u.Vorname, u.Email, u.Uid, u.Abteilung, u.Referat, u.Stelle, u.Kennwort, u.IstAdmin, u.Rolle
+                                FROM [zsPersonen] u
+                                WHERE u.Email = @Email";
+
+                    using (var command = new SqlCommand(query, connection))
                     {
-                        if (reader.Read())
+                        command.Parameters.AddWithValue("@Email", email);
+
+                        using (var reader = command.ExecuteReader())
                         {
-                            user = new Personen
+                            if (reader.Read())
                             {
-                                Id = (int)reader["Id"],
-                                Titel = reader["Titel"] as string,
-                                Name = reader["Name"] as string,
-                                Vorname = reader["Vorname"] as string,
-                                Email = reader["Email"] as string,
-                                Abteilung = reader["Abteilung"] as string,
-                                Referat = reader["Referat"] as string,
-                                Stelle = reader["Stelle"] as string,
-                                Kennwort = reader["Kennwort"] as string
-                            };
+                                user = new Personen
+                                {
+                                    Id = (int)reader["Id"],
+                                    Titel = reader["Titel"] as string,
+                                    Name = reader["Name"] as string,
+                                    Vorname = reader["Vorname"] as string,
+                                    Email = reader["Email"] as string,
+                                    UId = reader["UId"] as string,
+                                    Abteilung = reader["Abteilung"] as string,
+                                    Referat = reader["Referat"] as string,
+                                    Stelle = reader["Stelle"] as string,
+                                    Kennwort = reader["Kennwort"] as string,
+                                    IstAdmin = (bool)reader["IstAdmin"],
+                                    Rolle = reader["Rolle"] as string
+                                };
+                            }
                         }
                     }
                 }
+                return user;
             }
-
-            return user;
+            catch (Exception ex)
+            {
+                throw new RepositoryExceptions("Fehler beim Laden der Daten.", ex);
+            }
         }
-
-
-       
     }
 }

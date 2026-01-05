@@ -1,0 +1,290 @@
+﻿@model List<AdminPanelDB.Models.Adresse>
+
+@Html.Partial("_AdminNavbar")
+
+<div class="admin-right">
+
+    <div style="display:flex; gap:20px; text-align:center; align-items:center; margin-top:20px;">
+
+    <h2>Adressen</h2>
+    <div id="error-box" style="font-weight:bold; margin-top: 7px;
+         color:@(TempData["MessageType"]?.ToString() == "success" ? "green" :
+                TempData["MessageType"]?.ToString() == "error" ? "red" : "blue")">
+
+        @TempData["Message"]
+    </div>
+
+    </div>
+
+    <form method="get" asp-controller="Adresse" asp-action="Adresse" id="filterForm">
+          <div class="table-wrapper">
+              <table id="adresseTable">
+                  <thead>
+                      <tr>
+                        @{
+                            string GetSortDirection(string column)
+                            {
+                                if (ViewBag.Filters?.sortColumn == column)
+                                {
+                                    return ViewBag.Filters.sortDirection == "ASC" ? "DESC" : "ASC";
+                                }
+                                return "ASC";
+                            }
+
+                            string GetSortArrow(string column)
+                            {
+                                if (ViewBag.Filters?.sortColumn == column)
+                                {
+                                    return ViewBag.Filters.sortDirection == "ASC" ? "▲" : "▼";
+                                }
+                                return "●";
+                            }
+
+                            object GetSortLinkParams(string column)
+                            {
+                                return new
+                                {
+                                    sortColumn = column,
+                                    sortDirection = GetSortDirection(column),
+                                    page = ViewBag.Page,
+                                    pageSize = ViewBag.PageSize,
+                                    land = ViewBag.Filters?.land,
+                                    strasse = ViewBag.Filters?.strasse,
+                                    ort = ViewBag.Filters?.ort,
+                                    stateOrPrefecture = ViewBag.Filters?.stateOrPrefecture,
+                                    plz = ViewBag.Filters?.plz,
+                                    gebaude = ViewBag.Filters?.gebaude,
+                                    wohnung = ViewBag.Filters?.wohnung,
+                                    organisation = ViewBag.Filters?.organisation,
+                                    name = ViewBag.Filters?.name,
+                                    bezeichnung = ViewBag.Filters?.bezeichnung,
+                                    iban = ViewBag.Filters?.iban,
+                                    bic = ViewBag.Filters?.bic,
+                                    istInsolvent = ViewBag.Filters?.istInsolvent,
+                                    istAktiv = ViewBag.Filters?.istAktiv,
+                                    ansprechpartner = ViewBag.Filters?.ansprechpartner,
+                                    ansprechpartnerTel = ViewBag.Filters?.ansprechpartnerTel,
+                                    ansprechpartnerEmail = ViewBag.Filters?.ansprechpartnerEmail,
+                                    rechnungsLand = ViewBag.Filters?.rechnungsLand,
+                                    rechnungsStrasse = ViewBag.Filters?.rechnungsStrasse,
+                                    rechnungsOrt = ViewBag.Filters?.rechnungsOrt,
+                                    rechnungsStateOrPrefecture = ViewBag.Filters?.rechnungsStateOrPrefecture,
+                                    rechnungsPLZ = ViewBag.Filters?.rechnungsPlz,
+                                    rechnungsOrganisation = ViewBag.Filters?.rechnungsOrganisation,
+                                    rechnungsName = ViewBag.Filters?.rechnungsName,
+                                    gesamtadresse = ViewBag.Filters?.gesamtadresse
+                                };
+                            }
+                        }
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Land"))">Land @GetSortArrow("Land")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Strasse"))">Straße @GetSortArrow("Strasse")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Ort"))">Ort @GetSortArrow("Ort")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("StateOrPrefecture"))">Region @GetSortArrow("StateOrPrefecture")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("PLZ"))">PLZ @GetSortArrow("PLZ")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Gebaude"))">Gebäude @GetSortArrow("Gebaude")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Wohnung"))">Wohnung @GetSortArrow("Wohnung")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Organisation"))">Organisation @GetSortArrow("Organisation")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Name"))">Name @GetSortArrow("Name")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Bezeichnung"))">Bezeichnung @GetSortArrow("Bezeichnung")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Iban"))">IBAN @GetSortArrow("Iban")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Bic"))">BIC @GetSortArrow("Bic")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("IstInsolvent"))">IstInsolvent @GetSortArrow("IstInsolvent")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("IstAktiv"))">IstAktiv @GetSortArrow("IstAktiv")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Ansprechpartner"))">Ansprechpartner @GetSortArrow("Ansprechpartner")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("AnsprechpartnerTel"))">Ansprechpartner Telefon @GetSortArrow("AnsprechpartnerTel")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("AnsprechpartnerEmail"))">Ansprechpartner E-Mail @GetSortArrow("AnsprechpartnerEmail")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsStrasse"))">Rechnungsatraße @GetSortArrow("RechnungsStrasse")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsOrt"))">Rechnungsort @GetSortArrow("RechnungsOrt")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsPLZ"))">RechnungsPLZ @GetSortArrow("RechnungsPLZ")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsLand"))">Rechnungsland @GetSortArrow("RechnungsLand")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsStateOrPrefecture"))">Rechnungsregion @GetSortArrow("RechnungsStateOrPrefecture")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsOrganisation"))">Rechnungsorganisation @GetSortArrow("RechnungsOrganisation")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("RechnungsName"))">Rechnungsname @GetSortArrow("RechnungsName")</a></th>
+                        <th><a href="@Url.Action("Adresse", GetSortLinkParams("Gesamtadresse"))">Gesamtadresse @GetSortArrow("Gesamtadresse")</a></th>
+                        <th>Aktionen</th>
+                      </tr>
+
+                        <tr class="filter-row">
+                        <th><input type="text" name="land" value="@ViewBag.Filters?.land" placeholder="Filter Land" /></th>
+                        <th><input type="text" name="strasse" value="@ViewBag.Filters?.strasse" placeholder="Filter Straße" /></th>
+                        <th><input type="text" name="ort" value="@ViewBag.Filters?.ort" placeholder="Filter Ort" /></th>
+                        <th><input type="text" name="stateOrPrefecture" value="@ViewBag.Filters?.stateOrPrefecture" placeholder="Filter Region" /></th>
+                        <th><input type="text" name="plz" value="@ViewBag.Filters?.plz" placeholder="Filter PLZ" /></th>
+                        <th><input type="text" name="gebaude" value="@ViewBag.Filters?.gebaude" placeholder="Filter Gebäude" /></th>
+                        <th><input type="text" name="wohnung" value="@ViewBag.Filters?.wohnung" placeholder="Filter Wohnung" /></th>
+                        <th><input type="text" name="organisation" value="@ViewBag.Filters?.organisation" placeholder="Filter Organisation" /></th>
+                        <th><input type="text" name="name" value="@ViewBag.Filters?.name" placeholder="Filter Name" /></th>
+                        <th><input type="text" name="bezeichnung" value="@ViewBag.Filters?.bezeichnung" placeholder="Filter Bezeichnung" /></th>
+                        <th><input type="text" name="iban" value="@ViewBag.Filters?.iban" placeholder="Filter IBAN" /></th>
+                        <th><input type="text" name="bic" value="@ViewBag.Filters?.bic" placeholder="Filter BIC" /></th>
+                        <th>
+                            <select name="istInsolvent" onchange="document.getElementById('pageInput').value=1; document.getElementById('filterForm').submit();" style="padding:4px 6px; margin:0px; width:100px;" class="selectim">
+                                @{
+                                    var options = new[] {
+                                        new { Value = "", Text = "Alle" },
+                                        new { Value = "1", Text = "Ja" },
+                                        new { Value = "0", Text = "Nein" }
+                                    };
+
+                                    foreach (var opt in options)
+                                    {
+                                        var isSelected = (ViewBag.Filters?.istInsolvent == opt.Value) ? "selected" : "";
+                                        @:<option value="@opt.Value" @isSelected>@opt.Text</option>
+                                    }
+                                }
+                            </select>
+                        </th>
+                        <th>
+                            <select name="istAktiv" onchange="document.getElementById('pageInput').value=1; document.getElementById('filterForm').submit();" style="padding:4px 6px; margin:0px; width:100px;" class="selectim">
+                                @{
+                                    var options2 = new[] {
+                                        new { Value = "", Text = "Alle" },
+                                        new { Value = "1", Text = "Ja" },
+                                        new { Value = "0", Text = "Nein" }
+                                    };
+
+                                    foreach (var opt in options)
+                                    {
+                                        var isSelected = (ViewBag.Filters?.istAktiv == opt.Value) ? "selected" : "";
+                                        @:<option value="@opt.Value" @isSelected>@opt.Text</option>
+                                    }
+                                }
+                            </select>
+                        </th>
+                        <th><input type="text" name="ansprechpartner" value="@ViewBag.Filters?.ansprechpartner" placeholder="Filter Ansprechpartner" /></th>
+                        <th><input type="text" name="ansprechpartnerTel" value="@ViewBag.Filters?.ansprechpartnerTel" placeholder="Filter Ansprechpartner Telefon" /></th>
+                        <th><input type="text" name="ansprechpartnerEmail" value="@ViewBag.Filters?.ansprechpartnerEmail" placeholder="Filter Ansprechpartner E-Mail" /></th>
+                        <th><input type="text" name="rechnungsStrasse" value="@ViewBag.Filters?.rechnungsStrasse" placeholder="Filter Rechnungstraße" /></th>
+                        <th><input type="text" name="rechnungsOrt" value="@ViewBag.Filters?.rechnungsOrt" placeholder="Filter Rechnungsort" /></th>
+                        <th><input type="text" name="rechnungsPLZ" value="@ViewBag.Filters?.rechnungsPlz" placeholder="Filter RechnungsPLZ" /></th>
+                        <th><input type="text" name="rechnungsLand" value="@ViewBag.Filters?.rechnungsLand" placeholder="Filter Rechnungsland" /></th>
+                        <th><input type="text" name="rechnungsStateOrPrefecture" value="@ViewBag.Filters?.rechnungsStateOrPrefecture" placeholder="Filter Rechnungsregion" /></th>
+                        <th><input type="text" name="rechnungsOrganisation" value="@ViewBag.Filters?.rechnungsOrganisation" placeholder="Filter Rechnungsorganisation" /></th>
+                        <th><input type="text" name="rechnungsName" value="@ViewBag.Filters?.rechnungsName" placeholder="Filter Rechnungsname" /></th>
+                        <th><input type="text" name="gesamtadresse" value="@ViewBag.Filters?.gesamtadresse" placeholder="Filter Gesamtadresse" /></th>
+                            <th>
+                                <button type="submit" class="btn" onclick="document.getElementById('pageInput').value = 1;"><i class="fas fa-magnifying-glass"></i></button>
+                                <a asp-action="Adresse" class="abtn"><i class="fas fa-rotate-left"></i></a>
+                            </th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var entry in Model)
+                        {
+                            <tr id="row-@entry.Id">
+                                <td class="country-cell" data-code="@entry.Land?.Trim().ToUpper()">@(string.IsNullOrEmpty(entry.Land) ? "" : entry.Land)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Strasse) ? "" : entry.Strasse)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Ort) ? "" : entry.Ort)</td>
+                                <td>@(string.IsNullOrEmpty(entry.StateOrPrefecture) ? "" : entry.StateOrPrefecture)</td>
+                                <td>@(string.IsNullOrEmpty(entry.PLZ) ? "" : entry.PLZ)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Gebaude) ? "" : entry.Gebaude)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Wohnung) ? "" : entry.Wohnung)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Organisation) ? "" : entry.Organisation)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Name) ? "" : entry.Name)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Bezeichnung) ? "" : entry.Bezeichnung)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Iban) ? "" : entry.Iban)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Bic) ? "" : entry.Bic)</td>
+                                <!-- IstInsolvent. -->
+                                <td>
+                                    <input type="checkbox" disabled @(entry.IstInsolvent ? "checked" : "") class="form-check-input">
+                                </td>
+                                <!-- IstAktiv. -->
+                                <td>
+                                    <input type="checkbox" disabled @(entry.IstAktiv ? "checked" : "") class="form-check-input">
+                                </td>
+                                <td>@(string.IsNullOrEmpty(entry.Ansprechpartner) ? "" : entry.Ansprechpartner)</td>
+                                <td>@(string.IsNullOrEmpty(entry.AnsprechpartnerTel) ? "" : entry.AnsprechpartnerTel)</td>
+                                <td>@(string.IsNullOrEmpty(entry.AnsprechpartnerEmail) ? "" : entry.AnsprechpartnerEmail)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsStrasse) ? "" : entry.RechnungsStrasse)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsOrt) ? "" : entry.RechnungsOrt)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsPLZ) ? "" : entry.RechnungsPLZ)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsLand) ? "" : entry.RechnungsLand)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsStateOrPrefecture) ? "" : entry.RechnungsStateOrPrefecture)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsOrganisation) ? "" : entry.RechnungsOrganisation)</td>
+                                <td>@(string.IsNullOrEmpty(entry.RechnungsName) ? "" : entry.RechnungsName)</td>
+                                <td>@(string.IsNullOrEmpty(entry.Gesamtadresse) ? "" : entry.Gesamtadresse)</td>
+                                <td>
+                                    <a asp-controller="Adresse" asp-action="EditAdresse" asp-route-id="@entry.Id" asp-route-page="@ViewBag.Page" asp-route-sortColumn="@ViewBag.SortColumn" asp-route-sortDirection="@ViewBag.SortDirection" asp-route-pageSize="@ViewBag.PageSize" class="abtn">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+
+                                    <form asp-controller="Adresse" asp-action="DeleteAdresse" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@entry.Id" />
+                                        @Html.AntiForgeryToken()
+                                        <button type="button" class="btn" onclick="deleteAdresse(@entry.Id)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="26" style="text-align:center;">Keine Einträge gefunden</td></tr>
+                    }
+                </tbody>
+              </table>
+          </div>
+
+           <!-- Pagination. -->
+  <div class="table-footer-wrapper">
+        <div class="table-footer">
+
+        <label>Anzahl der Einträge:</label>
+        <input readonly type="number" value="@ViewBag.TotalCount" class="anzahl" style="width:60px; padding:5px;"/>
+             
+        @if (ViewBag.Page > 1)
+        {
+            <button type="submit" name="page" value="1" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+        }
+
+        @if (ViewBag.Page > 1)
+        {
+            <button type="submit" name="page" value="@(ViewBag.Page - 1)" class="btn btn-outline-secondary">    <i class="fas fa-arrow-left"></i></button>
+        }
+
+        <span>Seite @ViewBag.Page von @ViewBag.TotalPages</span>
+
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <button type="submit" name="page" value="@(ViewBag.Page + 1)" class="btn btn-outline-secondary">  <i class="fas fa-arrow-right"></i></button>
+        }
+
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <button type="submit" name="page" value="@ViewBag.TotalPages" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        }
+
+        <label for="pageInput">Gehe zu:</label>
+        <input type="number" id="pageInput" name="page" min="1" max="@ViewBag.TotalPages" value="@ViewBag.Page" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.form.submit();}" style="width:60px; padding:5px;" />
+        
+        <!-- Zeilen pro Seite. -->
+        <label for="pageSizeSelect">Zeilen pro Seite:</label>
+
+        <select name="pageSize" onchange="onPageSizeChange(this.value)" style="padding:4px 6px; width:60px;">
+                    @{
+                        int[] sizes = { 1, 5, 10, 20, 9999 };
+                        foreach (var size in sizes)
+                        {
+                            var isSelected = ViewBag.PageSize == size ? "selected" : "";
+                            var displayText = size == 9999 ? "Alle" : size.ToString();
+                            @:<option value="@size" @isSelected>@displayText</option>
+                }
+            }
+        </select>
+
+       <button type="submit" class="btn"><i class="fas fa-check"></i></button>
+
+        <a asp-action="Adresse" class="abtn"><i class="fas fa-rotate-left"></i></a>
+  </div>
+  </div>
+      </form>
+        <a asp-controller="Adresse" asp-action="CreateAdresse" class="btn-edit addabteilung"><i class="fas fa-plus"></i></a>
+</div>

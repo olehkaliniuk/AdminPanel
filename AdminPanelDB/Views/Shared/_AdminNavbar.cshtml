@@ -1,40 +1,32 @@
 ﻿<nav class="admin-navbar">
-    <a asp-controller="Admin" asp-action="AbRef">Abteilungen & Referate</a>
-    <a asp-controller="Admin" asp-action="Personen">Personen</a>
-    <a asp-controller="Admin" asp-action="Config">Config</a>
+    <a asp-controller="Admin" asp-action="AbRef"
+       class="@(ViewContext.RouteData.Values["action"].ToString() == "AbRef" ? "active" : "")">
+        <i class="fa-solid fa-layer-group"></i> Abteilungen & Referaten
+    </a>
+    <a asp-controller="Admin" asp-action="Personen"
+       class="@(ViewContext.RouteData.Values["action"].ToString() == "Personen" ? "active" : "")">
+        <i class="fa-solid fa-id-badge"></i>   Personen
+    </a>
+    <a asp-controller="KaGruppen" asp-action="KaGruppen"
+       class="@(ViewContext.RouteData.Values["action"].ToString() == "KaGruppen" ? "active" : "")">
+        <i class="fas fa-sitemap"></i>   Kategorien & Gruppen
+    </a>
+    <a asp-controller="Adresse" asp-action="Adresse"
+       class="@(ViewContext.RouteData.Values["controller"].ToString() == "Adresse" ? "active" : "")">
+        <i class="fa-solid fa-location-dot"></i> Adressen
+    </a>
+    <a asp-controller="Config" asp-action="Config"
+       class="@(ViewContext.RouteData.Values["controller"].ToString() == "Config" ? "active" : "")">
+        <i class="fa-solid fa-gear"></i> Config
+    </a>
+    <a asp-controller="Logs" asp-action="Logs"
+       class="@(ViewContext.RouteData.Values["controller"].ToString() == "Logs" ? "active" : "")">
+        <i class="fa-solid fa-file-lines"></i> Logs
+    </a>
+    <a asp-controller="ConfigLog" asp-action="ConfigLog"
+       class="@(ViewContext.RouteData.Values["controller"].ToString() == "ConfigLog" ? "active" : "")">
+        <i class="fa-solid fa-clipboard-list"></i> Config Logs
+    </a>
 </nav>
-<hr />
 
-<style>
-    /* Navbar для админки */
-    .admin-navbar {
-        background-color: #1f1f1f; /* темный фон, как у header */
-        padding: 10px 20px;
-        border-radius: 6px;
-        display: flex;
-        gap: 20px;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 14px;
-        margin-bottom: 15px;
-    }
 
-        .admin-navbar a {
-            color: #e0e0e0; /* светлый текст */
-            text-decoration: none;
-            font-weight: 400;
-            padding: 6px 12px;
-            border-radius: 4px;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-            .admin-navbar a:hover {
-                background-color: #2a2a2a; /* чуть светлее при наведении */
-                color: #ffffff;
-            }
-
-            .admin-navbar a.active {
-                background-color: #333333; /* активная ссылка */
-                color: #ffffff;
-            }
-
-</style>

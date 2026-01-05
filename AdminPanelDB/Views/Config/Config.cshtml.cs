@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AdminPanelDB.Views.Admin
+namespace AdminPanelDB.Views.Config
 {
-    public class PanelModel : PageModel
+    public class ConfigModel : PageModel
     {
         public void OnGet()
         {

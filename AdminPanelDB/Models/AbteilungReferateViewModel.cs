@@ -5,8 +5,8 @@ namespace AdminPanelDB.ViewModels
 {
     public class AbteilungReferateViewModel
     {
-        public Abteilung Abteilung { get; set; }
-        public List<Referat> Referate { get; set; }
+        public required Abteilung Abteilung { get; init; }
+        public required List<Referat> Referate { get; init; } = new();
 
     }
 }

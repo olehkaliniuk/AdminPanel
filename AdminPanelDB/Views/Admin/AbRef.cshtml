@@ -1,79 +1,252 @@
 ﻿@model AdminPanelDB.ViewModels.AdminPanelViewModel
 
-
-
 @Html.Partial("_AdminNavbar")
 
 
-@if (TempData["Error"] != null)
-{
-    <p style="color:red">@TempData["Error"]</p>
-}
 
+<div id="customToast" class="toast">
+    <span id="toastMessage"></span>
+</div>
 
-
-
-<!-- Linke Spalte: Abteilungen & Referate -->
 <div class="admin-left">
-    <h2>Admin Panel</h2>
+    <div style="display:flex; gap:20px; text-align:center; align-items:center; margin-top:20px;">
+    <h2>Abteilungen & Referaten</h2>
+        <div id="error-box" style="font-weight:bold; margin-top:7px;
+         color:@(TempData["MessageType"]?.ToString() == "success" ? "green" :
+                TempData["MessageType"]?.ToString() == "error" ? "red" : "blue")">
 
-    <form asp-action="CreateAbteilung" method="post">
-        <input type="text" name="name" placeholder="New Abteilung" />
-        <button type="submit">Add Abteilung</button>
+        @TempData["Message"]
+    </div>
+
+    </div>
+    <form asp-action="AbRef" method="get" id="mainForm">
+    <div class="table-wrapper"> 
+    <table id="abteilungenTable">
+    <thead>
+
+    @{
+    // Richtung nur umschalten, wenn bereits geklickt.
+    string GetSortDirection(string column)
+    {
+        // Wenn noch keine Sortierung gesetzt oder andere Spalte  ASC.
+        if (string.IsNullOrEmpty(Model.SortColumn) || Model.SortColumn != column)
+        {
+            return "ASC";
+        }
+        // Wenn aktuelle Spalte  umschalten.
+        return (Model.SortDirection == "ASC") ? "DESC" : "ASC";
+    }
+
+    string GetSortArrow(string column)
+    {
+        // Pfeil nur anzeigen, wenn schon nach dieser Spalte sortiert wurde.
+        if (string.IsNullOrEmpty(Model.SortColumn) || Model.SortColumn != column)
+        {
+            return "●";
+        }
+        return (Model.SortDirection == "ASC") ? "▲" : "▼";
+    }
+
+    object GetSortLinkParams(string column) => new
+    {
+        sortColumn = column,
+        sortDirection = GetSortDirection(column),
+        pageNumber = Model.Abteilungen?.PageIndex ?? 1,
+        pageSize = Model.Abteilungen?.PageSize ?? 10,
+        abteilungSearchTerm = Model.AbteilungSearchTerm ?? "",
+        referatSearchTerm = Model.ReferatSearchTerm ?? ""
+    };
+    }
+
+
+    <tr>
+        <th>
+            <a href="@Url.Action("AbRef", GetSortLinkParams("Name"))">
+                Abteilung @GetSortArrow("Name")
+            </a>
+        </th>
+        <th>
+            <a href="#" onclick="sortReferateGlobal(this); return false;" id="referateSortLink">
+                Referat <span id="referateSortArrow">●</span>
+            </a>
+        </th>
+
+        <th>Aktionen</th>
+    </tr>
+
+    <!-- Filter nach Abteilung. -->
+    <tr class="filter-row">
+        <th>
+            <input type="text" name="abteilungSearchTerm" value="@Model.AbteilungSearchTerm" placeholder="Suche Abteilung..." style="width: 100%; padding:4px;" />
+        </th>
+        <th> 
+            <input type="text" name="referatSearchTerm" value="@Model.ReferatSearchTerm" placeholder="Suche Referate..." style="width: 100%; padding:4px;" /></th>
+        <th>
+        <button type="submit" class="btn btn-primary btn-sm" onclick="document.getElementById('pageNumberInput').value = 1;"><i class="fas fa-magnifying-glass"></i></button>
+        <a asp-action="AbRef" class="abtn"><i class="fas fa-rotate-left"></i></a>
+        </th>
+    </tr>
+
+    </thead>
+
+    <tbody>
+    @if (Model.Abteilungen != null && Model.Abteilungen.Count > 0)
+    {
+    foreach (var item in Model.Abteilungen)
+    {
+
+    <tr data-abteilung-id="@item.Abteilung.Id" id="row-@item.Abteilung.Id">
+
+        <td >
+                
+        @Html.AntiForgeryToken()
+
+        <input type="text" id="abteilungName-@item.Abteilung.Id" value="@item.Abteilung.Name" data-original="@item.Abteilung.Name" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); saveAbteilung(@item.Abteilung.Id); }" maxlength="255"/>
+
+        <button type="button" onclick="saveAbteilung(@item.Abteilung.Id)">
+            <i class="fas fa-save"></i>
+        </button>
+
+
+        <button type="button" onclick="deleteAbteilung(@item.Abteilung.Id)"><i class="fas fa-trash"></i></button>
+   
+        </td>
+
+        <td>
+       
+
+        <div class="referate-list" style="height: @(item.Referate.Count > 2 ? "120px" : "auto"); resize: vertical; overflow: auto;">
+        @if(item.Referate != null && item.Referate.Count > 0)
+        {
+           
+
+        foreach (var refa in item.Referate)
+        {
+        <div class="referat-item" style="display:flex; gap:4px;" data-referat-id="@refa.Id">
+            @Html.AntiForgeryToken()
+            <input type="text" id="referatName-@refa.Id" value="@refa.Name" data-original="@refa.Name" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); saveReferat(@refa.Id); }" maxlength="255"/>
+            <button type="button" onclick="saveReferat(@refa.Id)">
+                <i class="fas fa-save"></i>
+            </button>
+            <button type="button" onclick="deleteReferat(@refa.Id)"><i class="fas fa-trash"></i></button>
+        </div>
+
+        }
+    
+
+        }
+        else
+        {
+        <div>Keine Referate</div>
+        }
+        </div>
+        </td>
+
+        <td>
+            @Html.AntiForgeryToken()
+            <div style="display:flex; gap:4px; align-items:center;">
+                <input type="text" id="newReferatName-@item.Abteilung.Id" placeholder="Neues Referat" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); createReferat(@item.Abteilung.Id); }" />
+                <button type="button" onclick="createReferat(@item.Abteilung.Id)">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            </td>
+        </tr>
+    }
+    }
+    else
+    {
+    <tr>
+        <td colspan="3" style="text-align:center;">Keine Einträge gefunden</td>
+    </tr>
+    }
+    </tbody>
+
+    </table>
+    </div>
+
+
+     <!-- Paginierung unter der Tabelle. -->
+
+    <div class="table-footer-wrapper">
+        <div class="table-footer">
+
+        <label>Anzahl der Einträge:</label>
+        <input readonly type="number" value="@ViewBag.TotalCount" style="width:60px; padding:5px;"/>
+
+        <!--  Erste Seite. -->
+        @if (Model.Abteilungen.PageIndex > 1)
+        {
+            <button type="submit" name="pageNumber" value="1" class="btn btn-outline-secondary" title="Erste Seite">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+        }
+
+        <!-- Vorherige Seite. -->
+        @if (Model.Abteilungen.PageIndex > 1)
+        {
+            <button type="submit" name="pageNumber" value="@(Model.Abteilungen.PageIndex - 1)" class="btn btn-outline-secondary" title="Vorherige Seite">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        }
+
+        <!-- Aktuelle Seite. -->
+        <span>Seite @Model.Abteilungen.PageIndex von @Model.Abteilungen.TotalPages</span>
+
+        <!-- Nächste Seite. -->
+        @if (Model.Abteilungen.PageIndex < Model.Abteilungen.TotalPages)
+        {
+            <button type="submit" name="pageNumber" value="@(Model.Abteilungen.PageIndex + 1)" class="btn btn-outline-secondary" title="Nächste Seite">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        }
+
+        <!-- Letzte Seite. -->
+        @if (Model.Abteilungen.PageIndex < Model.Abteilungen.TotalPages)
+        {
+            <button type="submit" name="pageNumber" value="@Model.Abteilungen.TotalPages" class="btn btn-outline-secondary" title="Letzte Seite">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        }
+
+        <label for="pageNumberInput">Gehe zu:</label>
+        <input type="number" id="pageNumberInput"
+               name="pageNumber"
+               min="1"
+               max="@Model.Abteilungen.TotalPages"
+               value="@Model.Abteilungen.PageIndex"
+               onkeydown="if(event.key==='Enter'){event.preventDefault(); this.form.submit();}"
+               style="width:60px; padding:5px;" />
+    
+
+        <!-- Zeilen pro Seite. -->
+        <label>Zeilen pro Seite:</label>
+        <select name="pageSize" onchange="onPageSizeChange()" style="padding:4px 6px;  width:60px;">
+            @{
+                int[] sizes = {1, 5, 10, 20, 9999};
+                foreach (var size in sizes)
+                {
+                    var isSelected = Model.Abteilungen.PageSize == size ? "selected" : "";
+                    var displayText = size == 9999 ? "Alle" : size.ToString();
+                    @:<option value="@size" @isSelected>@displayText</option>
+                }
+            }
+        </select>
+
+        <!-- go to. -->
+        <button type="submit" class="btn"><i class="fas fa-check"></i></button>
+
+        <!-- Reset. -->
+         <a asp-action="AbRef" class="abtn"><i class="fas fa-rotate-left"></i></a>
+        </div>
+    </div>
     </form>
 
-    <table id="abteilungenTable">
-        <thead>
-            <tr>
-                <th>Abteilung</th>
-                <th>Referate</th>
-                <th>Actions</th>
-            </tr>
-            <tr class="filter-row">
-                <th><input type="text" placeholder="Filter Abteilung" onkeyup="filterTable('abteilungenTable', 0)"></th>
-                <th><input type="text" placeholder="Filter Referate" onkeyup="filterTable('abteilungenTable', 1)"></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Abteilungen)
-            {
-                <tr>
-                    <td>
-                        <form asp-action="EditAbteilung" method="post">
-                            <input type="hidden" name="id" value="@item.Abteilung.Id" />
-                            <input type="text" name="newName" value="@item.Abteilung.Name" />
-                            <button type="submit">Save</button>
-                        </form>
-                        <form asp-action="DeleteAbteilung" method="post">
-                            <input type="hidden" name="id" value="@item.Abteilung.Id" />
-                            <button type="submit">Delete</button>
-                        </form>
-                    </td>
-                    <td>
-                        @foreach (var refa in item.Referate)
-                        {
-                            <form asp-action="EditReferat" method="post">
-                                <input type="hidden" name="id" value="@refa.Id" />
-                                <input type="text" name="name" value="@refa.Name" />
-                                <button type="submit">Save</button>
-                            </form>
-                            <form asp-action="DeleteReferat" method="post">
-                                <input type="hidden" name="id" value="@refa.Id" />
-                                <button type="submit">Delete</button>
-                            </form>
-                            <br />
-                        }
-                    </td>
-                    <td>
-                        <form asp-action="CreateReferat" method="post">
-                            <input type="hidden" name="abteilungId" value="@item.Abteilung.Id" />
-                            <input type="text" name="name" placeholder="New Referat" />
-                            <button type="submit">Add</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <!-- Neue Abteilung. -->
+    <form asp-action="CreateAbteilung" class="CreateAbteilung" method="post">
+        <input style="margin:4px;" type="text" name="name" placeholder="Neue Abteilung" />
+        <button type="submit" class="addabteilung btn"><i class="fas fa-plus"></i></button>
+    </form>
 </div>
+
+

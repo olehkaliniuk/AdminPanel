@@ -1,14 +1,14 @@
-﻿<h2>Login</h2>
+﻿<h2>Anmelden</h2>
 
 <form method="post" asp-controller="Auth" asp-action="Login" class="login">
     <div>
-        <input type="text" name="email" placeholder="Email" />
+        <input type="text" name="email" placeholder="E-Mail" />
     </div>
     <div>
-        <input type="password" name="kennwort" placeholder="Kennwort" />
+        <input type="password" name="kennwort" placeholder="Passwort" />
     </div>
     <div>
-        <button type="submit">Login</button>
+        <button type="submit">Anmelden</button>
     </div>
     @if (ViewBag.Error != null)
     {

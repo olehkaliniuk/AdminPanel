@@ -1,0 +1,88 @@
+﻿@model AdminPanelDB.Models.Hauptgruppe
+
+@if (ViewBag.Error != null)
+{
+    <p style="color:red; text-align:center; font-weight:bold;">
+        @ViewBag.Error
+    </p>
+}
+
+<h2 style="text-align:center;">Hauptgruppe bearbeiten</h2>
+
+
+<div class="form-container">
+    <form asp-action="EditHauptgruppe" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <input type="hidden" name="pageSize" value="@ViewBag.PageSize" />
+        <input type="hidden" name="pageNumber" value="@ViewBag.PageNumber" />
+
+
+        <div>
+            <label asp-for="GehoertZuKategorie">Kategorie:</label>
+            <select asp-for="GehoertZuKategorie"
+                    asp-items="@(new SelectList(ViewBag.Kategorien,
+                                                            "KategorieNummer",
+                                                            "Bezeichnung",
+                                                            Model.GehoertZuKategorie))"
+                    class="@( (ViewBag.DropdownEnable != null
+                                           && ViewBag.DropdownEnable == true
+                                           && Context.Session.GetInt32("IstAdmin") == 1)
+                                         ? ""
+                                         : "readonly-select")">
+            </select>
+        </div>
+        <div>
+            <label asp-for="Bezeichnung">Bezeichnung:</label>
+            <input asp-for="Bezeichnung" maxlength="120" />
+        </div>
+
+        <div>
+            <label asp-for="Kuerzel">Kuerzel:</label>
+            <input asp-for="Kuerzel" maxlength="10" />
+        </div>
+
+        <div>
+            <label asp-for="Beschreibung">Beschreibung:</label>
+            <textarea asp-for="Beschreibung" maxlength="280"></textarea>
+        </div>
+
+        <div>
+            <label asp-for="HauptgruppeNummer">HauptgruppeNummer:</label>
+            <input type="number" asp-for="HauptgruppeNummer" />
+        </div>
+
+        <div>
+            <label asp-for="LaufenderAktenzeichenZaehler">LaufenderAktenzeichenZaehler:</label>
+            <input type="number" asp-for="LaufenderAktenzeichenZaehler" />
+        </div>
+
+        <div>
+            <label asp-for="IstAktiv">IstAktiv:</label>
+            <input asp-for="IstAktiv" type="checkbox" />
+        </div>
+
+        <div>
+            <label asp-for="IstTestGruppe">IstTestGruppe:</label>
+            <input asp-for="IstTestGruppe" type="checkbox" />
+        </div>
+
+        <div>
+            <label>Auf alle Nebengruppen anwenden:</label>
+            <input name="applyToGroups" type="checkbox" value="true" />
+        </div>
+
+        <button type="submit">Speichern</button>
+
+    </form>
+
+
+    <a asp-action="KaGruppen"
+       asp-route-kategorieNummer="@Model.GehoertZuKategorie"
+       asp-route-pageNumber="@ViewBag.PageNumber"
+       asp-route-pageSize="@ViewBag.PageSize">
+        Zurück
+    </a>
+
+
+</div>  

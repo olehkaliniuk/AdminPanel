@@ -12,31 +12,31 @@ namespace AdminPanelDB.Controllers
     {
         private readonly AuthRepository _authRepository;
 
-
-
         public APIController(IConfiguration configuration)
         {
+            // Connection-String aus Konfiguration holen.
             string connString = configuration.GetConnectionString("DefaultConnection");
             _authRepository = new AuthRepository(connString);
         }
 
-   
 
+
+        // API-Endpunkt: Benutzerdaten abrufen.
         [HttpGet("user")]
         public IActionResult GetUserData()
         {
-            // Читаем Authorization header
+            // Authorization-Header auslesen.
             var authHeader = Request.Headers["Authorization"].FirstOrDefault();
 
             if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Basic "))
                 return Unauthorized("Missing or invalid Authorization header.");
 
-            // Декодируем Base64
+            // Base64-dekodieren.
             var encodedCredentials = authHeader.Substring("Basic ".Length).Trim();
             var decodedBytes = Convert.FromBase64String(encodedCredentials);
             var decodedString = Encoding.UTF8.GetString(decodedBytes);
 
-            // Формат email:password
+            // Email:Password aufteilen.
             var parts = decodedString.Split(':', 2);
             if (parts.Length != 2)
                 return Unauthorized("Invalid credentials format.");
@@ -44,19 +44,17 @@ namespace AdminPanelDB.Controllers
             var email = parts[0];
             var kennwort = parts[1];
 
-            // Проверяем пользователя (без хеширования)
-            if (!_authRepository.UserExists(email, kennwort))
-                return Unauthorized("Invalid email or password.");
+            // Login prüfen.
+            var (success, message) = _authRepository.TryLogin(email, kennwort);
+            if (!success)
+                return Unauthorized(message);
 
-            // Получаем данные пользователя
-            var user = _authRepository.GetUserByEmail(email);
+            // Benutzerdaten holen.
+            var user = _authRepository.GetUserByEmailAPI(email);
             if (user == null)
                 return NotFound("User not found.");
 
-
-
-
-            // Формируем XML
+            // XML erstellen.
             var xml = new XElement("User",
                 new XElement("Id", user.Id),
                 new XElement("Titel", user.Titel ?? ""),
@@ -70,7 +68,9 @@ namespace AdminPanelDB.Controllers
                 new XElement("Kennwort", user.Kennwort ?? "")
             );
 
+            // XML als Content zurückgeben.
             return Content(xml.ToString(), "application/xml", Encoding.UTF8);
         }
     }
 }
+

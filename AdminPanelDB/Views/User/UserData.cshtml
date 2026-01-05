@@ -1,17 +1,38 @@
 ﻿@model dynamic
 
+<div class="user-data-card">
+    <h2>Benutzerdaten</h2>
+    <ul>
+        <li><span class="label">Titel:</span> @Model.Titel</li>
+        <li><span class="label">Name:</span> @Model.Name</li>
+        <li><span class="label">Vorname:</span> @Model.Vorname</li>
+        <li><span class="label">E-Mail:</span> @Model.Email</li>
+        <li><span class="label">UId:</span> @Model.UId</li>
+        <li><span class="label">Abteilung:</span> @Model.Abteilung</li>
+        <li><span class="label">Referat:</span> @Model.Referat</li>
+        <li><span class="label">Stelle:</span> @Model.Stelle</li>
+        <li><span class="label">Rolle:</span> @Model.Rolle</li>
+        <li>
+            <span class="label">Superadmin:</span>@if(Model.IstAdmin)
+            {
+                <i class="fa-solid fa-crown" style="color:gold;"></i>
+            }else
+            {
 
-<h2>User Data</h2>
+            }
+        </li>
+    </ul>
+@if (Context.Session.GetString("UserName") != null)
+{
+    var isAdmin = Context.Session.GetString("Rolle") ?? "";
 
-<ul>
-    <li>Id = @Model.Id</li>
-    <li>Titel = @Model.Titel</li>
-    <li>Name = @Model.Name</li>
-    <li>Vorname = @Model.Vorname</li>
-    <li>Email = @Model.Email</li>
-    <li>UId = @Model.UId</li>
-    <li>Abteilung = @Model.Abteilung</li>
-    <li>Referat = @Model.Referat</li>
-    <li>Stelle = @Model.Stelle</li>
-    <li>Kennwort = @Model.Kennwort</li>
-</ul>
+    @if (isAdmin.Split(',').Any(r => r.Trim().Equals("Administrator", StringComparison.OrdinalIgnoreCase)))
+    {
+        <a asp-action="RedirectToPersonen" class="datenbearbeitenBtn">Daten bearbeiten</a>
+    }
+    else
+    {
+        <br />
+    }
+}
+</div>

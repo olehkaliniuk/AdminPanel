@@ -1,0 +1,276 @@
+﻿@model List<AdminPanelDB.Models.ConfigEntry>
+
+@Html.Partial("_AdminNavbar")
+
+
+<div class="admin-right">   
+    <div style="display:flex; gap:20px; text-align:center; align-items:center; margin-top:20px;">
+
+    <h2>Config</h2>
+    <div id="error-box" style="font-weight:bold; margin-top: 7px;
+         color:@(TempData["MessageType"]?.ToString() == "success" ? "green" :
+                TempData["MessageType"]?.ToString() == "error" ? "red" : "blue")">
+
+        @TempData["Message"]
+    </div>
+
+    </div>
+
+  <form method="get" asp-controller="Config" asp-action="Config" id="filterForm">
+  <div class="table-wrapper">
+  <table id="configTable">
+  <thead>
+       <tr>
+            @{
+                string GetSortDirection(string column)
+                {
+                    if(ViewBag.Filters?.sortColumn == column)
+                    {
+                        return ViewBag.Filters.sortDirection == "ASC" ? "DESC" : "ASC";
+                    }
+                    return "ASC";
+                }
+
+                string GetSortArrow(string column)
+                {
+                    if(ViewBag.Filters?.sortColumn == column)
+                    {
+                        return ViewBag.Filters.sortDirection == "ASC" ? "▲" : "▼";
+                    }
+                    return "●";
+                }
+
+                object GetSortLinkParams(string column)
+                {
+                    return new {
+                        sortColumn = column,
+                        sortDirection = GetSortDirection(column),
+                        page = ViewBag.Page,
+                        pageSize = ViewBag.PageSize,
+                        system = ViewBag.Filters?.system,
+                        projektName = ViewBag.Filters?.projektName,
+                        keyBezeichnung = ViewBag.Filters?.keyBezeichnung,
+                        stringValue = ViewBag.Filters?.stringValue,
+                        intValue = ViewBag.Filters?.intValue,
+                        boolValue = ViewBag.Filters?.boolValue,
+                        dateTimeValue = ViewBag.Filters?.dateTimeValue,
+                        beschreibung = ViewBag.Filters?.beschreibung,
+                        istAktiv = ViewBag.Filters?.istAktiv,
+                        anpassungGesperrt = ViewBag.Filters?.anpassungGesperrt,
+                        angepasstAm = ViewBag.Filters?.angepasstAm,
+                        angepasstVon = ViewBag.Filters?.angepasstVon
+                    };
+                }
+            }
+
+            <th><a href="@Url.Action("Config", GetSortLinkParams("System"))">System @GetSortArrow("System")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("ProjektName"))">Projektname @GetSortArrow("ProjektName")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("KeyBezeichnung"))">Schlüsselbezeichnung @GetSortArrow("KeyBezeichnung")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("StringValue"))">String-Wert @GetSortArrow("StringValue")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("IntValue"))">Int-Wert @GetSortArrow("IntValue")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("BoolValue"))">Boolescher Wert @GetSortArrow("BoolValue")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("DateTimeValue"))">Datum/Uhrzeit-Wert @GetSortArrow("DateTimeValue")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("Beschreibung"))">Beschreibung @GetSortArrow("Beschreibung")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("IstAktiv"))">IstAktiv @GetSortArrow("IstAktiv")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("AnpassungGesperrt"))">AnpassungGesperrt @GetSortArrow("AnpassungGesperrt")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("EintragAngepasstAm"))">EintragAngepasstAm @GetSortArrow("EintragAngepasstAm")</a></th>
+            <th><a href="@Url.Action("Config", GetSortLinkParams("EintragAngepasstVon"))">EintragAngepasstVon @GetSortArrow("EintragAngepasstVon")</a></th>
+            <th>Aktionen</th>
+       </tr>
+
+       <tr class="filter-row">
+            <th><input type="text" name="system" value="@ViewBag.Filters?.system" placeholder="Filter System" /></th>
+            <th><input type="text" name="projektName" value="@ViewBag.Filters?.projektName" placeholder="Filter ProjektName" /></th>
+            <th><input type="text" name="keyBezeichnung" value="@ViewBag.Filters?.keyBezeichnung" placeholder="Filter Schlüsselbezeichnung" /></th>
+            <th><input type="text" name="stringValue" value="@ViewBag.Filters?.stringValue" placeholder="Filter String-Wert" /></th>
+            <th><input type="text" name="intValue" value="@ViewBag.Filters?.intValue" placeholder="Filter Int-Wert" /></th>
+            <th>
+                <select name="boolValue" onchange="document.getElementById('pageInput').value=1; document.getElementById('filterForm').submit();" style="padding:4px 6px; margin:0px; width:100px;" class="selectim">
+                    @{
+                        var boolOptions = new[] {
+                            new { Value = "", Text = "Alle" },
+                            new { Value = "1", Text = "Ja" },
+                            new { Value = "0", Text = "Nein" }
+                        };
+
+                        foreach (var opt in boolOptions)
+                        {
+                            var isSelected = (ViewBag.Filters?.boolValue == opt.Value) ? "selected" : "";
+                            @:<option value="@opt.Value" @isSelected>@opt.Text</option>
+                        }
+                    }
+                </select>
+            </th>
+
+
+           
+            <th><input id="datetime" type="text" name="dateTimeValue" value="@ViewBag.Filters?.dateTimeValue" placeholder="Filter Datum/Uhrzeit-Wert" /></th>
+            <th><input type="text" name="beschreibung" value="@ViewBag.Filters?.beschreibung" placeholder="Filter Beschreibung" /></th>
+            <th>
+                <select name="istAktiv" onchange="document.getElementById('pageInput').value=1; document.getElementById('filterForm').submit();" style="padding:4px 6px; margin:0px; width:100px;" class="selectim">
+                    @{
+                        var options = new[] {
+                            new { Value = "", Text = "Alle" },
+                            new { Value = "1", Text = "Ja" },
+                            new { Value = "0", Text = "Nein" }
+                        };
+
+                        foreach (var opt in options)
+                        {
+                            var isSelected = (ViewBag.Filters?.istAktiv == opt.Value) ? "selected" : "";
+                            @:<option value="@opt.Value" @isSelected>@opt.Text</option>
+                        }
+                    }
+                </select>
+            </th>
+
+            <th>
+                <select name="anpassungGesperrt"
+                        onchange="document.getElementById('pageInput').value=1; document.getElementById('filterForm').submit();"
+                        style="padding:4px 6px; margin:0px; width:100px;" class="selectim">
+                    @{
+                        var options2 = new[] {
+                            new { Value = "", Text = "Alle" },
+                            new { Value = "1", Text = "true" },
+                            new { Value = "0", Text = "false" }
+                        };
+
+                        foreach (var opt in options)
+                        {
+                            var isSelected = (ViewBag.Filters?.anpassungGesperrt == opt.Value) ? "selected" : "";
+                            @:<option value="@opt.Value" @isSelected>@opt.Text</option>
+                        }
+                    }
+                </select>
+            </th>
+            <th><input type="text" name="angepasstAm" value="@ViewBag.Filters?.angepasstAm" placeholder="Filter AngepasstAm" /></th>
+            <th><input type="text" name="angepasstVon" value="@ViewBag.Filters?.angepasstVon" placeholder="Filter AngepasstVon" /></th>
+             
+            <th>
+                <button type="submit" class="btn"  onclick="document.getElementById('pageInput').value = 1;"><i class="fas fa-magnifying-glass"></i></button>
+                <a asp-action="Config" class="abtn">  <i class="fas fa-rotate-left"></i></a>
+            </th>
+       </tr>
+
+  </thead>
+  <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var entry in Model)
+                {
+                    <tr id="row-@entry.Id">
+                        <td>@entry.System</td>
+                        <td>@entry.ProjektName</td>
+                        <td>@entry.KeyBezeichnung</td>
+                        <td>@(string.IsNullOrEmpty(entry.StringValue) ? "" : entry.StringValue)</td>
+                        <td>@(entry.IntValue.HasValue ? entry.IntValue.ToString() : "")</td>
+                        <!-- BoolValue mit Checkbox und Strich. -->
+                        <td>
+                            @if (entry.BoolValue.HasValue)
+                              {
+                            <input type="checkbox" disabled="disabled" @(entry.BoolValue.Value ? "checked" : "") />
+                               }
+                             else
+                               {
+                             <span></span>
+                               }
+                        </td>
+                        <td>@(entry.DateTimeValue.HasValue ? entry.DateTimeValue.Value.ToString("yyyy-MM-dd HH:mm:ss") : "")</td>
+                        <td>@(string.IsNullOrEmpty(entry.Beschreibung) ? "" : entry.Beschreibung)</td>
+                        <!-- IstAktiv -->
+                        <td>
+                            <input type="checkbox" disabled @(entry.IstAktiv ? "checked" : "") class="form-check-input">
+                        </td>
+                        <!-- AnpassungGesperrt -->
+                        <td>
+                            <input type="checkbox" disabled @(entry.AnpassungGesperrt ? "checked" : "") class="form-check-input">
+                        </td>
+                        <td>@(entry.EintragAngepasstAm.HasValue ? entry.EintragAngepasstAm.Value.ToString("yyyy-MM-dd HH:mm:ss") : "")</td>
+                        <td>@(string.IsNullOrEmpty(entry.EintragAngepasstVon) ? "" : entry.EintragAngepasstVon)</td>
+                        <td>
+                          <a asp-controller="Config" asp-action="EditConfig"  asp-route-id="@entry.Id" asp-route-page="@ViewBag.Page" asp-route-sortColumn="@ViewBag.SortColumn" asp-route-sortDirection="@ViewBag.SortDirection"  asp-route-pageSize="@ViewBag.PageSize" class="abtn"> <i class="fas fa-pen"></i> </a>
+
+                            <form asp-controller="Config" asp-action="DeleteConfig" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@entry.Id" />
+                                @Html.AntiForgeryToken()
+                                <button type="button" class="btn" onclick="deleteConfig(@entry.Id)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="13" style="text-align:center;">Keine Einträge gefunden</td></tr>
+            }
+  </tbody>
+  </table>
+
+  </div>
+
+  <!-- Pagination. -->
+  <div class="table-footer-wrapper">
+        <div class="table-footer">
+
+        <label>Anzahl der Einträge:</label>
+        <input readonly type="number" value="@ViewBag.TotalCount" class="anzahl" style="width:60px; padding:5px;"/>
+             
+        @if (ViewBag.Page > 1)
+        {
+            <button type="submit" name="page" value="1" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+        }
+
+        @if (ViewBag.Page > 1)
+        {
+            <button type="submit" name="page" value="@(ViewBag.Page - 1)" class="btn btn-outline-secondary">    <i class="fas fa-arrow-left"></i></button>
+        }
+
+        <span>Seite @ViewBag.Page von @ViewBag.TotalPages</span>
+
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <button type="submit" name="page" value="@(ViewBag.Page + 1)" class="btn btn-outline-secondary">  <i class="fas fa-arrow-right"></i></button>
+        }
+
+        @if (ViewBag.Page < ViewBag.TotalPages)
+        {
+            <button type="submit" name="page" value="@ViewBag.TotalPages" class="btn btn-outline-secondary">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        }
+
+        <label for="pageInput">Gehe zu:</label>
+        <input type="number" id="pageInput" name="page" min="1" max="@ViewBag.TotalPages" value="@ViewBag.Page" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.form.submit();}" style="width:60px; padding:5px;" />
+        
+        <!-- Zeilen pro Seite. -->
+        <label for="pageSizeSelect">Zeilen pro Seite:</label>
+
+        <select name="pageSize" onchange="onPageSizeChange(this.value)" style="padding:4px 6px; width:60px;">
+                    @{
+                        int[] sizes = { 1, 5, 10, 20, 9999 };
+                        foreach (var size in sizes)
+                        {
+                            var isSelected = ViewBag.PageSize == size ? "selected" : "";
+                            var displayText = size == 9999 ? "Alle" : size.ToString();
+                            @:<option value="@size" @isSelected>@displayText</option>
+                }
+            }
+        </select>
+
+       <button type="submit" class="btn"><i class="fas fa-check"></i></button>
+
+        <a asp-action="Config" class="abtn"><i class="fas fa-rotate-left"></i></a>
+  </div>
+  </div>
+
+  </form>
+  <a asp-controller="Config" asp-action="CreateConfig" class="btn-edit addabteilung"><i class="fas fa-plus"></i></a>
+</div>
+
+
+
+

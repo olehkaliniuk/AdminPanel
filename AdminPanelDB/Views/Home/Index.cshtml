@@ -1,1 +1,34 @@
-﻿<h2>Home</h2>
+﻿
+
+<h2>Startseite</h2>
+
+@if (Context.Session.GetString("UserName") != null)
+{
+    var isAdmin = Context.Session.GetString("Rolle") ?? "";
+
+    <div class="startcontainer">
+        <a asp-controller="User" asp-action="UserData" >-Benutzerdaten</a>
+
+
+        @if (isAdmin.Split(',').Any(r => r.Trim().Equals("Administrator", StringComparison.OrdinalIgnoreCase)))
+        {
+
+        <a asp-controller="Admin" asp-action="AbRef" >-Administrationsbereich</a>
+        <div class="startsecondcont">
+
+            <a asp-controller="Admin" asp-action="AbRef" >-Abteilungen & Referaten bearbeiten</a>
+            <a asp-controller="Admin" asp-action="Personen" >-Personen bearbeiten</a>
+            <a asp-controller="KaGruppen" asp-action="KaGruppen" >-Kategorien & Gruppen bearbeiten</a>
+            <a asp-controller="Adresse" asp-action="Adresse" >-Adressen bearbeiten</a>
+            <a asp-controller="Config" asp-action="Config" >-Config bearbeiten</a>
+            <a asp-controller="Logs" asp-action="Logs">-Logs anzeigen</a>
+            <a asp-controller="ConfigLog" asp-action="ConfigLog">-Config Logs anzeigen</a>
+
+        </div>
+        }
+    </div>
+}
+else
+{
+    <br />
+}
