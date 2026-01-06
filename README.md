@@ -59,4 +59,11 @@ To gain real commercial development experience, work with production-level archi
 
 <p align="center">
   <img src="AdminPanelDB/screenshots/1.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135028.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135123.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135208.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135219.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135245.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135255.png" />
+   <img src="AdminPanelDB/screenshots/Screenshot 2026-01-06 135309.png" />
 </p>
