@@ -56,4 +56,4 @@ Project goal:
 To gain real commercial development experience, work with production-level architecture, and strengthen my backend and frontend skills in ASP.NET Core, MVC, and SQL-based systems.
 
 
-(screenshots/1.png)
+(AdminPanelDB/screenshots/1.png)
