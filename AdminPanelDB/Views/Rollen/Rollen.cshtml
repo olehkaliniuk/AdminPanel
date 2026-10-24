@@ -1,0 +1,194 @@
+﻿@model AdminPanelDB.Models.RolleViewModel
+
+@Html.Partial("_AdminNavbar")
+
+<div id="customToast" class="toast">
+    <span id="toastMessage"></span>
+</div>
+
+<div class="admin-left">
+
+    <div style="display:flex; gap:20px; text-align:center; align-items:center; margin-top:20px;">
+@*         <h2>Rollen</h2>
+        <div id="error-box" style="font-weight:bold; margin-top:7px; color:@(TempData["MessageType"]?.ToString() == "success" ? "green" : TempData["MessageType"]?.ToString() == "error" ? "red" : "blue")">
+            @TempData["Message"]
+        </div> *@
+    </div>
+
+    <form asp-action="Rollen" method="get" id="mainForm">
+        <div class="table-wrapper">
+            <table id="rollenTable">
+                <thead>
+                    @{
+                        string GetSortDirection(string column)
+                        {
+                            if (string.IsNullOrEmpty(Model.RolleSortColumn) || Model.RolleSortColumn != column)
+                                return "ASC";
+
+                            return Model.RolleSortDirection == "ASC" ? "DESC" : "ASC";
+                        }
+
+                        string GetSortArrow(string column)
+                        {
+                            if (string.IsNullOrEmpty(Model.RolleSortColumn) || Model.RolleSortColumn != column)
+                                return "●";
+
+                            return Model.RolleSortDirection == "ASC" ? "▲" : "▼";
+                        }
+
+                        object GetSortLinkParams(string column)
+                        {
+                            return new
+                            {
+                                sortColumn = column,
+                                sortDirection = GetSortDirection(column),
+                                pageNumber = Model.Rollen?.PageIndex ?? 1,
+                                pageSize = Model.Rollen?.PageSize ?? 10,
+                                rolleSearchTerm = Model.RolleSearchTerm ?? ""
+                            };
+                        }
+                    }
+
+                    <tr>
+                        <th>
+                            <a href="@Url.Action("Rollen", GetSortLinkParams("Name"))">
+                                Rolle @GetSortArrow("Name")
+                            </a>
+                        </th>
+                        <th>Aktionen</th>
+                    </tr>
+
+                    <!-- Suche -->
+                    <tr class="filter-row">
+                        <th>
+                            <input type="text" name="rolleSearchTerm" value="@Model.RolleSearchTerm" placeholder="Suche Rolle..." style="width:100%; padding:4px;" />
+                        </th>
+                        <th>
+                            <button type="submit" class="btn btn-primary btn-sm" onclick="document.getElementById('pageNumberInput').value = 1;">
+                                <i class="fas fa-magnifying-glass"></i>
+                            </button>
+                            <a asp-action="Rollen" class="abtn">
+                                <i class="fas fa-rotate-left"></i>
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.Rollen != null && Model.Rollen.Count > 0)
+                    {
+                        foreach (var item in Model.Rollen)
+                        {
+                            <tr id="row-@item.Id" data-rolle-id="@item.Id">
+                                <td>
+                                    @Html.AntiForgeryToken()
+                                    <input type="text" id="rolleName-@item.Id" value="@item.Name" data-original="@item.Name" maxlength="255" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); saveRolle(@item.Id); }" />
+                                    <button type="button" onclick="saveRolle(@item.Id)">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    <button type="button" onclick="deleteRolle(@item.Id)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                                <td></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="2" style="text-align:center;">Keine Einträge gefunden</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="table-footer-wrapper">
+            <div class="table-footer">
+
+                <!-- Seiten -->
+                <div class="pagination-section">
+                    @if (Model.Rollen.PageIndex > 1)
+                    {
+                        <button type="submit" name="pageNumber" value="1" class="btn btn-outline-secondary" title="Erste Seite">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                    }
+
+                    @if (Model.Rollen.PageIndex > 1)
+                    {
+                        <button type="submit" name="pageNumber" value="@(Model.Rollen.PageIndex - 1)" class="btn btn-outline-secondary" title="Vorherige Seite">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    }
+
+                    <span>Seite @Model.Rollen.PageIndex von @Model.Rollen.TotalPages</span>
+
+                    @if (Model.Rollen.PageIndex < Model.Rollen.TotalPages)
+                    {
+                        <button type="submit" name="pageNumber" value="@(Model.Rollen.PageIndex + 1)" class="btn btn-outline-secondary" title="Nächste Seite">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    }
+
+                    @if (Model.Rollen.PageIndex < Model.Rollen.TotalPages)
+                    {
+                        <button type="submit" name="pageNumber" value="@Model.Rollen.TotalPages" class="btn btn-outline-secondary" title="Letzte Seite">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    }
+
+                    <label for="pageNumberInput">Gehe zu:</label>
+                    <input type="number" id="pageNumberInput" name="pageNumber" min="1" max="@Model.Rollen.TotalPages" value="@Model.Rollen.PageIndex" onkeydown="if(event.key==='Enter'){ event.preventDefault(); this.form.submit(); }" style="width:5em; padding:5px;" />
+                </div>
+
+                <!-- Page Size -->
+                <div class="pagination-section">
+                    <label>Zeilen pro Seite:</label>
+                    <select name="pageSize" onchange="onPageSizeChange()" style="padding:4px 6px; width:5em;">
+                        @{
+                            int[] sizes = { 1, 5, 10, 20, 9999 };
+
+                            @foreach (var size in sizes)
+                            {
+                                var isSelected = Model.Rollen.PageSize == size;
+                                var displayText = size == 9999 ? "Alle" : size.ToString();
+
+                                <option value="@size" selected="@isSelected">@displayText</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Anzahl -->
+                <div class="pagination-section">
+                    <label>Anzahl der Einträge:</label>
+                    <input readonly type="number" value="@ViewBag.TotalCount" style="width:5em; padding:5px;" />
+                    <button type="submit" class="btn">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <a asp-action="Rollen" class="abtn">
+                        <i class="fas fa-rotate-left"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <!-- Neue Rolle -->
+    <form asp-action="CreateRolle" method="post" class="CreateRolle">
+        @Html.AntiForgeryToken()
+        <input style="margin:4px;" type="text" name="name" placeholder="Neue Rolle" maxlength="255" />
+        <button type="submit" class="addabteilung btn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/Rollen.js" asp-append-version="true"></script>
+}

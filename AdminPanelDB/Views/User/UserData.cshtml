@@ -1,0 +1,37 @@
+﻿@model AdminPanelDB.Models.Personen
+
+<div class="user-data-card">
+    <h2>Benutzerdaten</h2>
+    <ul>
+        <li><span class="label">Titel:</span> @Model.Titel</li>
+        <li><span class="label">Name:</span> @Model.Name</li>
+        <li><span class="label">Vorname:</span> @Model.Vorname</li>
+        <li><span class="label">E-Mail:</span> @Model.Email</li>
+        <li><span class="label">UId:</span> @Model.UId</li>
+        <li>
+            <span class="label">Abteilung:</span>
+            <span>@string.Join(", ", Model.AbteilungReferate.Select(x => x.Abteilung))</span>
+        </li>
+        <li><span class="label">Referat:</span> 
+            <span>@Html.Raw(string.Join(", ", Model.AbteilungReferate.Select(x => $"{x.Abteilung} - <span class=\"referat-text-info\">{x.Referat}</span>")))</span>
+        </li>
+        <li><span class="label">Stelle:</span> @Model.Stelle</li>
+        <li>
+            <span class="label">Rollen:</span>
+            <span>@string.Join(", ", Model.Rollen.Select(r => r.Rolle))</span>
+        </li>
+        <li>
+            <span class="label">Administrator:</span>
+            @if (ViewBag.IsAdmin)
+            {
+                <i class="fa-solid fa-crown" style="color:gold;"></i>
+            }
+        </li>
+    </ul>
+    @if (ViewBag.IsAdmin)
+    {
+        <a asp-action="RedirectToPersonen" class="datenbearbeitenBtn">
+            Daten bearbeiten
+        </a>
+    }
+</div>

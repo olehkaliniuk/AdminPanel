@@ -1,0 +1,36 @@
+﻿@using System.Text.Json
+
+
+@if (Context.Session.GetString("UserName") != null)
+{
+    var rollenJson = Context.Session.GetString("Rollen");
+    var rollen = string.IsNullOrEmpty(rollenJson) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(rollenJson);
+    bool isAdmin = rollen.Any(r =>r.Equals("Administrator", StringComparison.OrdinalIgnoreCase));
+    bool isDreiF = rollen.Any(r => r.Equals("DreiF", StringComparison.OrdinalIgnoreCase));
+
+    <div class="startcontainer">
+        <a asp-controller="User" asp-action="UserData">-Benutzerdaten</a>
+        @if (isAdmin)
+        {
+            <a asp-controller="Admin" asp-action="AbRef">-Administrationsbereich</a>
+            <div class="startsecondcont">
+                <a asp-controller="Admin" asp-action="AbRef">-Abteilungen & Referaten bearbeiten</a>
+                <a asp-controller="Admin" asp-action="Personen">-Personen bearbeiten</a>
+@*                 <a asp-controller="KaGruppen" asp-action="KaGruppen">-Kategorien & Gruppen bearbeiten</a> *@
+                <a asp-controller="Adresse" asp-action="Adresse">-Adressen bearbeiten</a>
+                <a asp-controller="Config" asp-action="Config">-Config bearbeiten</a>
+                <a asp-controller="ConfigLog" asp-action="ConfigLog">-Config Logs anzeigen</a>
+                @if (isDreiF)
+                {
+                    <a asp-controller="Logs" asp-action="Logs">-Logs anzeigen</a>
+                }
+                <a asp-controller="VorlagenVerwaltung" asp-action="VorlagenVerwaltung">-Vorlagenverwaltung anzeigen</a>
+                <a asp-controller="Rollen" asp-action="Rollen">-Rollen anzeigen</a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <br />
+}

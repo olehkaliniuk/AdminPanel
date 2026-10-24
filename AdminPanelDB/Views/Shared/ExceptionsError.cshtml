@@ -1,0 +1,15 @@
+﻿@model (string FriendlyMessage, string ErrorDetails)
+
+<h2>Fehler</h2>
+
+<div>
+    <strong>Nachricht:</strong>
+    <p>@Model.FriendlyMessage</p>
+</div>
+
+<div>
+    <strong>Details:</strong>
+    <pre>@Model.ErrorDetails</pre>
+</div>
+
+<a href="javascript:history.back()" style="text-decoration:underline;">Zurück</a>

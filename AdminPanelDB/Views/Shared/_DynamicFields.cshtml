@@ -1,0 +1,9 @@
+﻿@model Tuple<List<string>, string>
+
+@foreach(var field in Model.Item1)
+{
+    <div>
+        <label>@field:</label>
+        <input type="text" name="@($"{Model.Item2}_{field}")" />
+    </div>
+}

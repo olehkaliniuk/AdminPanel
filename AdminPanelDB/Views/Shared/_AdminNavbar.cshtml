@@ -1,0 +1,55 @@
+﻿@using System.Text.Json
+
+@if (Context.Session.GetString("UserName") != null)
+{
+    var rollenJson = Context.Session.GetString("Rollen");
+    var rollen = string.IsNullOrEmpty(rollenJson) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(rollenJson);
+    bool isAdmin = rollen.Any(r => r.Equals("Administrator", StringComparison.OrdinalIgnoreCase));
+    bool isDreiF = rollen.Any(r => r.Equals("DreiF", StringComparison.OrdinalIgnoreCase));
+
+    <nav class="admin-navbar">
+        <a asp-controller="Admin" asp-action="AbRef"
+        class="@(ViewContext.RouteData.Values["action"].ToString() == "AbRef" ? "active" : "")">
+            <i class="fa-solid fa-layer-group"></i> Abteilungen & Referaten
+        </a>
+        <a asp-controller="Admin" asp-action="Personen"
+        class="@(ViewContext.RouteData.Values["action"].ToString() == "Personen" ? "active" : "")">
+            <i class="fa-solid fa-id-badge"></i>   Personen
+        </a>
+        @*     <a asp-controller="KaGruppen" asp-action="KaGruppen"
+       class="@(ViewContext.RouteData.Values["action"].ToString() == "KaGruppen" ? "active" : "")">
+        <i class="fas fa-sitemap"></i>   Kategorien & Gruppen
+    </a> *@
+        <a asp-controller="Adresse" asp-action="Adresse"
+        class="@(ViewContext.RouteData.Values["controller"].ToString() == "Adresse" ? "active" : "")">
+            <i class="fa-solid fa-location-dot"></i> Adressen
+        </a>
+        <a asp-controller="Config" asp-action="Config"
+        class="@(ViewContext.RouteData.Values["controller"].ToString() == "Config" ? "active" : "")">
+            <i class="fa-solid fa-gear"></i> Config
+        </a>
+
+        <a asp-controller="ConfigLog" asp-action="ConfigLog"
+           class="@(ViewContext.RouteData.Values["controller"].ToString() == "ConfigLog" ? "active" : "")">
+            <i class="fa-solid fa-clipboard-list"></i> Config Logs
+        </a>
+
+        @if(isDreiF)
+        {
+            <a asp-controller="Logs" asp-action="Logs"
+            class="@(ViewContext.RouteData.Values["controller"].ToString() == "Logs" ? "active" : "")">
+                <i class="fa-solid fa-file-lines"></i> Logs
+            </a>
+        }
+
+        <a asp-controller="VorlagenVerwaltung" asp-action="VorlagenVerwaltung"
+        class="@(ViewContext.RouteData.Values["controller"].ToString() == "VorlagenVerwaltung" ? "active" : "")">
+            <i class="fa-solid fa-clipboard-list"></i> Vorlagenverwaltung
+        </a>
+
+        <a asp-controller="Rollen" asp-action="Rollen"
+           class="@(ViewContext.RouteData.Values["controller"].ToString() == "Rollen" ? "active" : "")">
+            <i class="fa-solid fa-clipboard-list"></i> Rollen
+        </a>
+    </nav>
+}

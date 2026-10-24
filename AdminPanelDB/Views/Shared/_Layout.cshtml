@@ -1,0 +1,244 @@
+﻿@using System.Text.Json
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AdminPanelDB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script>
+        // Direktes Anwenden von Theme, Akzentfarbe und Schriftgröße beim Laden der Seite.
+        (function () {
+            try {
+                const theme = localStorage.getItem("theme") || "dark";
+
+                const defaultAccents = { dark: '#2a2a2a', light: '#ffffff', blue: '#c4d4e8' };
+
+                // Entferne alle möglichen Themenklassen, bevor du die neue hinzufügst.
+                document.documentElement.classList.remove("dark-theme", "light-theme", "blue-theme");
+
+                if (theme === "dark") document.documentElement.classList.add("dark-theme");
+                if (theme === "light") document.documentElement.classList.add("light-theme");
+                if (theme === "blue") document.documentElement.classList.add("blue-theme");
+
+                const accent = localStorage.getItem("accentColor");
+                const color = accent || defaultAccents[theme];
+
+                document.documentElement.style.setProperty('--color-btn-bg', color);
+
+                const r = parseInt(color.substr(1, 2), 16);
+                const g = parseInt(color.substr(3, 2), 16);
+                const b = parseInt(color.substr(5, 2), 16);
+
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                const textColor = brightness > 128 ? '#111111' : '#e0e0e0';
+
+                document.documentElement.style.setProperty('--color-btn-text', textColor);
+
+                const font = localStorage.getItem('fontSizePx');
+                if (font) {
+                    document.documentElement.style.fontSize = font + 'rem';
+                }
+
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+    <div id="custom-dialog" class="custom-dialog">
+        <div class="dialog-box">
+            <div id="dialog-message"></div>
+            <div class="dialog-buttons">
+                <button id="dialog-ok">OK</button>
+                <button id="dialog-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Einfaches Dialogsystem, das alert() und confirm() ersetzt.
+        (function() {
+            const dialog = document.getElementById("custom-dialog");
+            const msgBox = document.getElementById("dialog-message");
+            const okBtn = document.getElementById("dialog-ok");
+            const cancelBtn = document.getElementById("dialog-cancel");
+
+            function showDialog(message, showCancel) {
+                return new Promise(resolve => {
+                    msgBox.textContent = message;
+                    if(showCancel) {
+                        cancelBtn.style.display = "inline-block";
+                    } else {
+                        cancelBtn.style.display = "none";
+                    }
+
+                    dialog.classList.add("show");
+                    dialog.style.display = "flex";
+
+                    okBtn.onclick = () => {
+                        dialog.classList.remove("show");
+                        setTimeout(() => { dialog.style.display = "none"; }, 200);
+                        resolve(true);
+                    };
+
+                    cancelBtn.onclick = () => {
+                        dialog.classList.remove("show");
+                        setTimeout(() => { dialog.style.display = "none"; }, 200);
+                        resolve(false);
+                    };
+                });
+            }
+
+            // Überschreiben global.
+            window.alert = function(message) {
+                return showDialog(message, false);
+            };
+
+            window.confirm = function(message) {
+                return showDialog(message, true);
+            };
+        })();
+    </script>
+
+
+    <header>
+        <div>
+            <ul>
+                @if (Context.Session.GetString("UserName") == null)
+                {
+                    <li><a asp-controller="Auth" asp-action="Login">Anmelden</a></li>
+                }
+                else
+                {
+                    var rollenJson = Context.Session.GetString("Rollen");
+
+                    var rollen = string.IsNullOrEmpty(rollenJson)
+                    ? new List<string>()
+                    : JsonSerializer.Deserialize<List<string>>(rollenJson);
+
+                    bool isAdmin = rollen.Any(r =>r.Equals("Administrator", StringComparison.OrdinalIgnoreCase));
+                    bool isDreiF = rollen.Any(r => r.Equals("DreiF", StringComparison.OrdinalIgnoreCase));
+
+                    <li><a asp-controller="Auth" asp-action="Logout">Abmelden</a></li>
+                    <li><a asp-controller="User" asp-action="UserData">Benutzer</a></li>
+
+                    @if (isAdmin)
+                    {
+                        <li>
+                            <a asp-controller="Admin" asp-action="AbRef">Administrationsbereich</a>
+                        </li>
+                    }
+
+                    @if (isDreiF)
+                    {
+                        <li id="mandant-switcher" style="display:none;">
+                            <select id="mandantSelect"></select>
+                        </li>
+                    }
+
+                    <li>
+                        <i class="fa-solid fa-user" style="margin-right:5px;"></i>
+                        @Context.Session.GetString("UserEmail")
+
+                        @if (isAdmin)
+                        {
+                            <i class="fa-solid fa-crown" style="color:gold;"></i>
+                        }
+                    </li>
+                }
+                <li>
+                    <!-- Toggle theme. -->
+                    <button id="themeToggle" title="Thema wechseln">
+                    </button>
+
+                </li>
+                <li style="position: relative;">
+                    <button id="colorMenuToggle"><i class="fas fa-palette"></i></button>
+                    <div id="colorMenu" class="color-menu">
+                        <input type="color" id="colorPicker" value="#2a2a2a" />
+                        <button id="resetColorBtn"><i class="fas fa-xmark"></i></button>
+                    </div>
+                </li>
+                <li>
+                    <select name="font" id="fontselector">
+                        <option value="0.625">75%</option>
+                        <option value="0.875" selected>100%</option>
+                        <option value="1">125%</option>
+                        <option value="1.25">150%</option>
+                        <option value="1.5">175%</option>
+                        <option value="2">200%</option>
+                    </select>
+                </li>
+
+            </ul>
+        </div>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+
+
+            @if (!string.IsNullOrEmpty(TempData["Message"]?.ToString()))
+            {
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        showToast(@Json.Serialize(TempData["Message"]?.ToString()),
+                                  @Json.Serialize(TempData["MessageType"]?.ToString() ?? "info"));
+                    });
+                </script>
+            }
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
+
+
+<script>
+    (async function initMandantSwitcher() {
+        const container = document.getElementById('mandant-switcher');
+        if (!container) return; // kein DreiF-Benutzer, Dropdown nicht vorhanden
+
+        try {
+            const response = await fetch('/Mandant/GetAllMandanten');
+            const contentType = response.headers.get('content-type') || '';
+            if (!response.ok || !contentType.includes('application/json')) return;
+
+            const mandanten = await response.json();
+            const select = document.getElementById('mandantSelect');
+
+            mandanten.forEach(m => {
+                const option = document.createElement('option');
+                option.value = m.id;
+                option.textContent = m.name;
+                select.appendChild(option);
+            });
+
+            const activeResponse = await fetch('/Mandant/GetActiveMandant');
+            if (activeResponse.ok) {
+                const active = await activeResponse.json();
+                select.value = active.mandantId;
+            }
+
+            container.style.display = 'block';
+
+            select.addEventListener('change', async () => {
+                await fetch('/Mandant/SwitchMandant', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `mandantId=${select.value}`
+                });
+                location.reload();
+            });
+        } catch (err) {
+            console.error('Mandant-Switcher konnte nicht geladen werden:', err);
+        }
+    })();
+</script>
